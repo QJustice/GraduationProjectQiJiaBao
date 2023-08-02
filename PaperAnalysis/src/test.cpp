@@ -465,8 +465,72 @@ int main()
      std::cout << "Hello World!\n" << length << std::endl;*/
 
      // ±éÀúXMLÎÄµµ
-     ergodicTag(root);
+     // ergodicTag(root);
+    const char* gXPathExpression = "//w:background";
+    XMLCh* xpathStr = XERCES_CPP_NAMESPACE::XMLString::transcode(gXPathExpression);
+    try
+    {
+        char* pMsg = nullptr;
+        XMLCh* nsURI = XERCES_CPP_NAMESPACE::XMLString::transcode("http://www.w3.org/XML/1998/namespace");
+        XERCES_CPP_NAMESPACE::DOMXPathNSResolver* resolver = doc->createNSResolver(root);
+        if (nullptr != resolver->lookupPrefix(nsURI))
+        {     
+            pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(resolver->lookupPrefix(nsURI));
+            XERCES_STD_QUALIFIER cout << pMsg << XERCES_STD_QUALIFIER endl;
+        }
+        else
+        {
+            XERCES_STD_QUALIFIER cout << "lookupPrefix failed" << XERCES_STD_QUALIFIER endl;
+        }
+        if (nullptr != resolver->lookupNamespaceURI(XERCES_CPP_NAMESPACE::XMLUni::fgXMLString))
+        {
+            pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(resolver->lookupNamespaceURI(XERCES_CPP_NAMESPACE::XMLUni::fgXMLString));
+            XERCES_STD_QUALIFIER cout << pMsg << XERCES_STD_QUALIFIER endl;
+        }
+        else
+        {
+            XERCES_STD_QUALIFIER cout << "lookupNamespaceURI failed" << XERCES_STD_QUALIFIER endl;
+        }
 
+        XERCES_CPP_NAMESPACE::XMLString::release(&pMsg);
+        XERCES_CPP_NAMESPACE::XMLString::release(&nsURI);
+
+        XERCES_CPP_NAMESPACE::DOMXPathResult* result = doc->evaluate(
+            xpathStr,
+            root,
+            resolver,
+            XERCES_CPP_NAMESPACE::DOMXPathResult::ORDERED_NODE_SNAPSHOT_TYPE,
+            NULL);
+
+        XMLSize_t nLength = result->getSnapshotLength();
+        for (XMLSize_t i = 0; i < nLength; i++)
+        {
+            result->snapshotItem(i);
+            printTag(result->getNodeValue());
+        }
+
+        result->release();
+        resolver->release();
+    }
+    catch (const XERCES_CPP_NAMESPACE::DOMXPathException& e)
+    {
+        char* pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(e.getMessage());
+        XERCES_STD_QUALIFIER cerr << "An error occurred during processing of the XPath expression. Msg is:"
+            << XERCES_STD_QUALIFIER endl
+            << pMsg << XERCES_STD_QUALIFIER endl;
+        XERCES_CPP_NAMESPACE::XMLString::release(&pMsg);
+        return -1;
+    }
+    catch (const XERCES_CPP_NAMESPACE::DOMException& e)
+    {
+        char* pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(e.getMessage());
+        XERCES_STD_QUALIFIER cerr << "An error occurred during processing of the XPath expression. Msg is:"
+            << XERCES_STD_QUALIFIER endl
+            << pMsg << XERCES_STD_QUALIFIER endl;
+        XERCES_CPP_NAMESPACE::XMLString::release(&pMsg);
+        return -1;
+    }
+    XERCES_CPP_NAMESPACE::XMLString::release(&xpathStr);
 
     parser->release();
 
