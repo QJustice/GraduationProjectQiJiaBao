@@ -8,7 +8,6 @@ set (jsoncpp_DIR "C:/Program Files/jsoncpp/lib/cmake/jsoncpp")
 set (jsoncpp_LIBRARIES "jsoncpp_lib")
 set (jsoncpp_INCLUDE_DIRS "C:/Program Files/jsoncpp/include/")
 
-# find_package(XercesC REQUIRED)
 find_package(XercesC CONFIG REQUIRED)
 find_package (jsoncpp CONFIG REQUIRED)
 
@@ -24,11 +23,19 @@ message(STATUS "jsoncpp_VERSION: ${jsoncpp_VERSION}")
 message(STATUS "jsoncpp_FOUND: ${jsoncpp_FOUND}")
 message(STATUS "jsoncpp_DIR: ${jsoncpp_DIR}")
 
-set(SOURCE 
-	"src/paper_analysis.cpp"
-	"src/paper_analysis.h"
-	"src/test.cpp"
-	"src/config.inc")
+# 输出cmake版本
+message(STATUS "cmake version: ${CMAKE_VERSION}")
+
+include_directories("header")
+
+set(HEADER
+	"header/paper_analysis.h"
+	"header/config.inc")
+
+set(SRC
+	"src/paper_analysis.cpp")
+
+set(SOURCE ${HEADER} ${SRC})
 
 # 将源代码添加到此项目的可执行文件。
 add_executable (${PROJECT_NAME} ${SOURCE})
@@ -37,6 +44,7 @@ add_executable (${PROJECT_NAME} ${SOURCE})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${XercesC_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${jsoncpp_LIBRARIES})
 
+add_subdirectory("test")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET paper_analysis PROPERTY CXX_STANDARD 20)

@@ -1,3 +1,15 @@
+#include <iostream>
+
+
+using namespace std;
+
+int main()
+{
+	cout << "hello test" << endl;
+	return 0;
+}
+
+
 #if 0
 
 #include <iostream>
@@ -347,7 +359,7 @@ void ergodicTagAnalysis(XERCES_CPP_NAMESPACE::DOMElement* root)
 			ergodicTag(root->getNextElementSibling());
 	}
 }
-int main01()
+int main()
 {
 	// Initialize the XML4C2 system.
 	try
