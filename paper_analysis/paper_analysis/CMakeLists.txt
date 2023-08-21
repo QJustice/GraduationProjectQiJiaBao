@@ -28,14 +28,13 @@ message(STATUS "cmake version: ${CMAKE_VERSION}")
 
 include_directories("header")
 
-set(HEADER
+set(SOURCE
 	"header/paper_analysis.h"
-	"header/config.inc")
+	"header/config.inc"
+	"header/translation_label.h"
 
-set(SRC
-	"src/paper_analysis.cpp")
-
-set(SOURCE ${HEADER} ${SRC})
+	"src/paper_analysis.cpp"
+	"src/translation_label.cpp")
 
 # 将源代码添加到此项目的可执行文件。
 add_executable (${PROJECT_NAME} ${SOURCE})
