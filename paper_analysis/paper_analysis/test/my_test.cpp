@@ -2,14 +2,66 @@
 #include <fstream>
 #include <json/json.h>
 #include <functional>
+#include <string>
+#include <map>
+#include <cassert>
+
+#include "translation_label.h"
 
 using namespace std;
 
+class Error
+{
+public:
+  Error(int value, const std::string& str)
+  {
+    m_value = value;
+    m_message = str;
+#ifdef _DEBUG
+    ErrorMap::iterator found = GetErrorMap().find(value);
+    if (found != GetErrorMap().end())
+      assert(found->second == m_message);
+#endif
+    GetErrorMap()[m_value] = m_message;
+  }
+
+  // auto-cast Error to integer error code
+  operator int() { return m_value; }
+
+private:
+  int m_value;
+  std::string m_message;
+
+  typedef std::map<int, std::string> ErrorMap;
+  static ErrorMap& GetErrorMap()
+  {
+    static ErrorMap errMap;
+    return errMap;
+  }
+
+public:
+
+  static std::string GetErrorString(int value)
+  {
+    ErrorMap::iterator found = GetErrorMap().find(value);
+    if (found == GetErrorMap().end())
+    {
+      assert(false);
+      return "";
+    }
+    else
+    {
+      return found->second;
+    }
+  }
+};
+
 int main()
 {
+
   std::cout << "hello test" << endl;
   const char* filePath = "D:/WorkSpace/GraduationProject/2020graduationprojectqijiabao/paper_analysis/paper_analysis/data/label_dict.json";
-  //读取文件中的数据
+  // 读取文件中的数据
   std::ifstream ifs; // 创建一个 std::ifstream 对象
   ifs.open(filePath, ios::in || ios::binary);
   if (!ifs.is_open())
@@ -34,18 +86,39 @@ int main()
     std::cout << "parseJsonFromString error!" << std::endl;
     return -1;
   }
+  //Json::StreamWriterBuilder builder;
+  //builder["emitUTF8"] = true;
+  //std::string str;
+  //str = Json::writeString(builder, root["document"]["Attribute"]);
+
+  //cout << str << endl;
+  //Json::Value value = root["document"]["Attribute"];
+
+  //Json::StyledWriter swriter;
+  //str = swriter.write(value);
+
+  //std::cout << str << endl;
+
+  qi::CTranslationLabel translationLabel;
+  translationLabel.loadFile(filePath);
+  std::string labelDescription = translationLabel.getLabelDescription("background", "Attribute");
+  cout << labelDescription << endl;
+  labelDescription = translationLabel.getLabelDescription("background", "Attribute1");
+  cout << labelDescription << endl;
+  labelDescription = translationLabel.getLabelDescription("background1", "Attribute");
+  cout << labelDescription << endl;
   Json::StreamWriterBuilder builder;
   builder["emitUTF8"] = true;
-    
-  std::string str = Json::writeString(builder, root);
+  std::string str;
+  Json::Value root1;
+  root1 = translationLabel.getLabelAttribute("bottom", "Description");
+  str = Json::writeString(builder, root1);
+  cout << str << endl;
 
-  Json::Value value = root["document"]["Attribute"];
-
-  Json::StyledWriter swriter;
-  str = swriter.write(value);
-
-  std::cout << str << endl;
-
+  root1 = translationLabel.getLabelAttributeValue("bottom", "Description","val");
+  str = Json::writeString(builder, root1);
+  cout << str << endl;
+  
   return 0;
 }
 

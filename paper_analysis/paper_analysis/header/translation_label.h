@@ -5,21 +5,27 @@
 
 #include <json/json.h>
 
+#include "config.h"
+#include "error_code.h"
+
 namespace qi {
 
 class CTranslationLabel
 {
  public:
-
   CTranslationLabel();
+  CTranslationLabel(char const* file_path);
   ~CTranslationLabel();
 
-  std::string getLabelDescription(char const* lable_name, Json::Value const* node);
-  Json::Value getLabelAttribute(char const* lable_name, Json::Value const* node);
-  std::string getLabelAttributeValue(char const* lable_name, char const* attribute_value, Json::Value const* node);
+  qierr::error_code loadFile(char const* file_path);
+  bool belongToMember(char const* member_name, Json::Value* node);
+  std::string getLabelDescription(char const* lable_name, char const* lable_sign);
+  Json::Value getLabelAttribute(char const* lable_name, char const* lable_sign);
+  Json::Value getLabelAttributeValue(char const* lable_name, char const* lable_sign, char const* attribute_value);
  private:
-  Json::Value m_root;
-  Json::Reader m_reader;
+  Json::Value* root_;
+  Json::Reader* reader_;
+  std::string file_path_;
 };
 
 }

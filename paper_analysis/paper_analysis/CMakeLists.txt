@@ -30,14 +30,17 @@ include_directories("header")
 
 set(SOURCE
 	"header/paper_analysis.h"
+  "header/error_code.h"
+  "header/config.h"
 	"header/config.inc"
 	"header/translation_label.h"
 
 	"src/paper_analysis.cpp"
-	"src/translation_label.cpp")
+	"src/translation_label.cpp"
+  "src/error_code.cpp")
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (${PROJECT_NAME} ${SOURCE})
+add_executable (${PROJECT_NAME} ${SOURCE} "header/config.h" "src/error_code.cpp")
 
 # link_libraries(${XercesC_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${XercesC_LIBRARIES})
