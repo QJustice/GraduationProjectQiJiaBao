@@ -99,12 +99,24 @@ enum errorcode {
   E_READFAIL_CODE,       ///< 资源对象(如文件或目录、socket)读取、接收失败
   E_WRITEFAIL_CODE,      ///< 资源对象(如文件或目录、socket)写入、发送失败
   E_DELFAIL_CODE,        ///< 资源对象(如文件或目录、socket)删除、关闭失败
+  E_ILLEGAL_CODE,        ///< 资源对象(如文件、目录、socket、设备等)非法
   E_CODECFAIL_CODE,      ///< 加解密、编码解密失败
   E_CRC_FAIL_CODE,       ///< crc校验错误
   E_TOOMANY_CODE,        ///< 消息、缓冲区、内容太多
   E_TOOSMALL_CODE,       ///< 消息、缓冲区、内容太少
   E_NETNOTREACH_CODE,    ///< 网络不可达（无路由，网关错误）
   E_NETDOWN_CODE,        ///< 网络不可用（断网）
+  E_XMLEXCEPTION_CODE,   ///< xml解析错误
+  E_JSONEXCEPTION_CODE,  ///< json解析错误
+  E_FILEEXCEPTION_CODE,  ///< 文件操作错误
+  E_NETEXCEPTION_CODE,   ///< 网络操作错误
+  E_DBEXCEPTION_CODE,    ///< 数据库操作错误
+  E_DOMEXCEPTTON_CODE,   ///< dom操作错误
+  E_ILLEGAL_FILE_CODE,   ///< 非法文件
+  E_ILLEGAL_PATH_CODE,   ///< 非法路径
+
+  E_UNKNOWN_CODE = 100,  ///< 未知错误
+
 
   // more...
 
@@ -134,12 +146,22 @@ static Error E_OPENFAIL(E_OPENFAIL_CODE, "Device or resource open failed");
 static Error E_READFAIL(E_READFAIL_CODE, "Device or resource read failed");
 static Error E_WRITEFAIL(E_WRITEFAIL_CODE, "Device or resource write failed");
 static Error E_DELFAIL(E_DELFAIL_CODE, "Device or resource delete failed");
+static Error E_ILLEGAL(E_ILLEGAL_CODE, "Device or resource illegal");
 static Error E_CODECFAIL(E_CODECFAIL_CODE, "Encode or decode failed");
 static Error E_CRC_FAIL(E_CRC_FAIL_CODE, "CRC failed");
 static Error E_TOOMANY(E_TOOMANY_CODE, "Object too many");
 static Error E_TOOSMALL(E_TOOSMALL_CODE, "Object too small");
 static Error E_NETNOTREACH(E_NETNOTREACH_CODE, "Network is unreachable");
 static Error E_NETDOWN(E_NETDOWN_CODE, "Network is down");
+static Error E_XMLEXCEPTION(E_XMLEXCEPTION_CODE, "XML exception");
+static Error E_JSONEXCEPTION(E_JSONEXCEPTION_CODE, "JSON exception");
+static Error E_FILEEXCEPTION(E_FILEEXCEPTION_CODE, "File exception");
+static Error E_NETEXCEPTION(E_NETEXCEPTION_CODE, "Network exception");
+static Error E_DBEXCEPTION(E_DBEXCEPTION_CODE, "Database exception");
+static Error E_DOMEXCEPTTON(E_DOMEXCEPTTON_CODE, "DOM exception");
+static Error E_ILLEGAL_FILE(E_ILLEGAL_FILE_CODE, "Illegal file");
+static Error E_ILLEGAL_PATH(E_ILLEGAL_PATH_CODE, "Illegal path");
+static Error E_UNKNOWN(E_UNKNOWN_CODE, "Unknown error");
 
 }; // namespace qi
 

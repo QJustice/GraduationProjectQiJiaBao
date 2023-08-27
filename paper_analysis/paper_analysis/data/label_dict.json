@@ -1,37 +1,33 @@
 {
   "document": {
     "Description": "文档",
-    "Attribute": {
-      "conformance": "文档一致性",
-      "xmlns": "命名空间",
-      "xmlns:wpc": "wpc命名空间",
-      "xmlns:mc": "mc命名空间",
-      "xmlns:o": "o命名空间",
-      "xmlns:r": "r命名空间",
-      "xmlns:m": "m命名空间",
-      "xmlns:v": "v命名空间",
-      "xmlns:wp14": "wp14命名空间",
-      "xmlns:wp": "wp命名空间",
-      "xmlns:w10": "w10命名空间",
-      "xmlns:w": "w命名空间",
-      "xmlns:w14": "w14命名空间",
-      "xmlns:w15": "w15命名空间",
-      "xmlns:wpg": "wpg命名空间",
-      "xmlns:wpi": "wpi命名空间",
-      "xmlns:wne": "wne命名空间",
-      "xmlns:wps": "wps命名空间",
-      "mc:Ignorable": "mc忽略",
-      "xmlns:wpf": "wpf命名空间"
-    }
+    "conformance": "文档一致性",
+    "xmlns": "命名空间",
+    "xmlns:wpc": "wpc命名空间",
+    "xmlns:mc": "mc命名空间",
+    "xmlns:o": "o命名空间",
+    "xmlns:r": "r命名空间",
+    "xmlns:m": "m命名空间",
+    "xmlns:v": "v命名空间",
+    "xmlns:wp14": "wp14命名空间",
+    "xmlns:wp": "wp命名空间",
+    "xmlns:w10": "w10命名空间",
+    "xmlns:w": "w命名空间",
+    "xmlns:w14": "w14命名空间",
+    "xmlns:w15": "w15命名空间",
+    "xmlns:wpg": "wpg命名空间",
+    "xmlns:wpi": "wpi命名空间",
+    "xmlns:wne": "wne命名空间",
+    "xmlns:wps": "wps命名空间",
+    "mc:Ignorable": "mc忽略",
+    "xmlns:wpf": "wpf命名空间"
   },
   "background": {
     "Description": "背景",
-    "Attribute": {
-      "color": "颜色",
-      "themeColor": "基础主题颜色",
-      "themeShade": "主题阴影",
-      "themeTint": "主题色调值"
-    }
+    "color": "颜色",
+    "themeColor": "基础主题颜色",
+    "themeShade": "主题阴影",
+    "themeTint": "主题色调值"
   },
   "body": {
     "Description": "文档主体"
@@ -71,19 +67,15 @@
   },
   "jc": {
     "Description": "段落对齐方式",
-    "Attribute": {
-      "val": {
-        "Description": "段落对齐方式",
-        "Value": {
-          "both": "两端对齐",
-          "center": "居中对齐",
-          "distribute": "分散对齐",
-          "end": "右对齐",
-          "left": "左对齐",
-          "right": "右对齐",
-          "start": "左对齐"
-        }
-      }
+    "val": {
+      "Description": "段落对齐方式",
+      "both": "两端对齐",
+      "center": "居中对齐",
+      "distribute": "分散对齐",
+      "end": "右对齐",
+      "left": "左对齐",
+      "right": "右对齐",
+      "start": "左对齐"
     }
   },
   "keepLines": {
@@ -127,51 +119,45 @@
   },
   "bottom": {
     "Description": "段落的底部边框",
-    "Attribute": {
-      "color": "颜色",
-      "shadow": {
-        "Description": "是否显示阴影",
-        "Value": {
-          "true": "显示",
-          "false": "不显示"
-        }
-      },
-      "space": "间距",
-      "sz": "大小",
-      "val": {
-        "Description": "边框样式",
-        "Value": {
-          "single": "单线",
-          "dashDotStroked": "点划线",
-          "dashed": "虚线",
-          "dashSmallGap": "短划线",
-          "dotDash": "点划线",
-          "dotDotDash": "双点划线",
-          "dotted": "点线",
-          "double": "双线",
-          "doubleWave": "双波浪线",
-          "inset": "内嵌线",
-          "nil": "无",
-          "none": "无",
-          "outset": "外嵌线",
-          "thick": "粗线",
-          "thickThinLargeGap": "粗细线",
-          "thickThinMediumGap": "粗细线",
-          "thickThinSmallGap": "粗细线",
-          "thinThickLargeGap": "细粗线",
-          "thinThickMediumGap": "细粗线",
-          "thinThickSmallGap": "细粗线",
-          "thinThickThinLargeGap": "细粗细线",
-          "thinThickThinMediumGap": "细粗细线",
-          "thinThickThinSmallGap": "细粗细线",
-          "threeDEmboss": "三维浮雕",
-          "threeDEngrave": "三维雕刻",
-          "triple": "三线",
-          "wave": "波浪线",
-          "hairline": "细线",
-          "slantDashDot": "斜线点划线"
-        }
-      }
+    "color": "颜色",
+    "shadow": {
+      "Description": "是否显示阴影",
+      "true": "显示",
+      "false": "不显示"
+    },
+    "space": "间距",
+    "sz": "大小",
+    "val": {
+      "Description": "边框样式",
+      "single": "单线",
+      "dashDotStroked": "点划线",
+      "dashed": "虚线",
+      "dashSmallGap": "短划线",
+      "dotDash": "点划线",
+      "dotDotDash": "双点划线",
+      "dotted": "点线",
+      "double": "双线",
+      "doubleWave": "双波浪线",
+      "inset": "内嵌线",
+      "nil": "无",
+      "none": "无",
+      "outset": "外嵌线",
+      "thick": "粗线",
+      "thickThinLargeGap": "粗细线",
+      "thickThinMediumGap": "粗细线",
+      "thickThinSmallGap": "粗细线",
+      "thinThickLargeGap": "细粗线",
+      "thinThickMediumGap": "细粗线",
+      "thinThickSmallGap": "细粗线",
+      "thinThickThinLargeGap": "细粗细线",
+      "thinThickThinMediumGap": "细粗细线",
+      "thinThickThinSmallGap": "细粗细线",
+      "threeDEmboss": "三维浮雕",
+      "threeDEngrave": "三维雕刻",
+      "triple": "三线",
+      "wave": "波浪线",
+      "hairline": "细线",
+      "slantDashDot": "斜线点划线"
     }
   },
   "left": {

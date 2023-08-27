@@ -37,10 +37,11 @@ set(SOURCE
 
 	"src/paper_analysis.cpp"
 	"src/translation_label.cpp"
-  "src/error_code.cpp")
+  "src/error_code.cpp"
+  "src/main.cpp")
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (${PROJECT_NAME} ${SOURCE} "header/config.h" "src/error_code.cpp")
+add_executable (${PROJECT_NAME} ${SOURCE} "header/config.h" "src/error_code.cpp" "src/main.cpp")
 
 # link_libraries(${XercesC_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${XercesC_LIBRARIES})

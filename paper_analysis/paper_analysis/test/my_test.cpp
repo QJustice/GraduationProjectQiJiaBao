@@ -101,12 +101,12 @@ int main()
 
   qi::CTranslationLabel translationLabel;
   translationLabel.loadFile(filePath);
-  std::string labelDescription = translationLabel.getLabelDescription("background", "Attribute");
+  /*std::string labelDescription = translationLabel.getLabelDescription("background", "Attribute");
   cout << labelDescription << endl;
   labelDescription = translationLabel.getLabelDescription("background", "Attribute1");
   cout << labelDescription << endl;
   labelDescription = translationLabel.getLabelDescription("background1", "Attribute");
-  cout << labelDescription << endl;
+  cout << labelDescription << endl;*/
   Json::StreamWriterBuilder builder;
   builder["emitUTF8"] = true;
   std::string str;
@@ -115,8 +115,11 @@ int main()
   str = Json::writeString(builder, root1);
   cout << str << endl;
 
-  root1 = translationLabel.getLabelAttributeValue("bottom", "Description","val");
+ /* root1 = translationLabel.getLabelAttributeValue("bottom", "Attribute","val");
   str = Json::writeString(builder, root1);
+  cout << str << endl;*/
+  cout << "-------------------------------------------\n";
+  str = translationLabel.getLabelAttributeDescription("bottom", "Description", "single");
   cout << str << endl;
   
   return 0;
