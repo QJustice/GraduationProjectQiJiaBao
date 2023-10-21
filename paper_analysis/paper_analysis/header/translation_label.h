@@ -1,15 +1,30 @@
 #ifndef PAPER_ANALYSIS_TRANSLATION_LABEL_H
 #define PAPER_ANALYSIS_TRANSLATION_LABEL_H
 
+#include <iostream>
+#include <fstream>
 #include <string>
-
 #include <json/json.h>
-
 #include "config.h"
 #include "error_code.h"
 
 namespace qi {
 
+
+class CTranslationLabel
+{
+public:
+  CTranslationLabel();
+  CTranslationLabel(const std::string& filePath);
+  qierr::error_code loadFile(char const* file_path);
+  std::string findValueByKey(const std::string& key);
+private:
+  std::string m_filePath_;
+  Json::Value m_root_;
+  Json::Reader m_reader_;
+};
+
+#if 0
 class CTranslationLabel
 {
  public:
@@ -27,6 +42,6 @@ class CTranslationLabel
   Json::Value* root_= nullptr;
   Json::Reader* reader_ = nullptr;
 };
-
-}
+#endif
+} // namespace qi
 #endif //PAPER_ANALYSIS_TRANSLATION_LABEL_H

@@ -1,4 +1,112 @@
 #include <iostream>
+#include "translation_label.h"
+
+
+int main()
+{
+  std::string filePath = "D:/WorkSpace/GraduationProject/2020graduationprojectqijiabao/paper_analysis/paper_analysis/data/label_dict.json";
+  qi::CTranslationLabel translationLabel(filePath);
+  std::string key = "document$conformance";
+  std::string value = translationLabel.findValueByKey(key);
+
+  if (!value.empty()) {
+    std::cout << "Value for key '" << key << "' is: " << value << std::endl;
+  }
+  else {
+    std::cout << "Key '" << key << "' not found" << std::endl;
+  }
+
+  return 0;
+}
+
+#if 0
+#include <iostream>
+#include <stack>
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include "paper_analysis.h"
+
+using namespace std;
+using namespace xercesc;
+
+void printNodeInfo(DOMNode* node) {
+
+  cout << "Node Name: " << XERCES_CPP_NAMESPACE::XMLString::transcode(node->getNodeName()) << endl;
+
+  if (node->getNodeType() == DOMNode::ELEMENT_NODE) {
+    DOMNamedNodeMap* attributes = node->getAttributes();
+    if (attributes && attributes->getLength() > 0) {
+      cout << "Attributes: ";
+      for (XMLSize_t i = 0; i < attributes->getLength(); ++i) {
+        DOMNode* attribute = attributes->item(i);
+        cout << XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getNodeName()) << "=\""
+          << XERCES_CPP_NAMESPACE::XMLString::transcode( attribute->getNodeValue()) << "\" ";
+      }
+      cout << endl;
+    }
+  }
+
+  char* nodeValue = XMLString::transcode(node->getNodeValue());
+  if (nodeValue && XMLString::stringLen(nodeValue) > 0) {
+    cout << "Node Value: " << nodeValue << endl;
+  }
+  XMLString::release(&nodeValue);
+}
+
+void dfsTraverse(DOMNode* root) {
+
+  stack<DOMNode*> nodeStack;
+  nodeStack.push(root);
+
+  while (!nodeStack.empty()) {
+    DOMNode* node = nodeStack.top();
+    nodeStack.pop();
+
+    printNodeInfo(node);
+
+    DOMNodeList* children = node->getChildNodes();
+    XMLSize_t const numChildren = children->getLength();
+    cout << "Children: " << numChildren << endl;
+    for (XMLSize_t i = numChildren - 1; i < numChildren; --i) {
+      DOMNode* child = children->item(i);
+      cout << "Child: " << i << XERCES_CPP_NAMESPACE::XMLString::transcode(child->getNodeName()) << endl;
+      if (child && child->getNodeType() == DOMNode::ELEMENT_NODE) {
+        nodeStack.push(child);
+      }
+    }
+  }
+}
+
+int main() {
+
+  XERCES_CPP_NAMESPACE::DOMElement* root = nullptr;
+  XERCES_CPP_NAMESPACE::DOMElement* body = nullptr;
+  qi::CPaperAnalysis paper_analysis;
+  paper_analysis.init();
+  paper_analysis.loadXMLFile("D:/WorkSpace/VSCodeFile/word/Test04/word/document.xml");
+
+  paper_analysis.getDomElement(root);
+  paper_analysis.getBodyElement(body);
+  XERCES_CPP_NAMESPACE::DOMElement* body1 = paper_analysis.getBodyElement();
+
+  dfsTraverse(dynamic_cast<XERCES_CPP_NAMESPACE::DOMNode*>(paper_analysis.getBodyElement()));
+
+  paper_analysis.relese();
+
+
+
+  ;
+
+  return 0;
+}
+
+#endif
+
+#if 0
+
+#include <iostream>
 #include <fstream>
 #include <json/json.h>
 #include <functional>
@@ -13,7 +121,7 @@ using namespace std;
 class Error
 {
 public:
-  Error(int value, const std::string& str)
+  Error(int value, std::string const& str)
   {
     m_value = value;
     m_message = str;
@@ -60,7 +168,7 @@ int main()
 {
 
   std::cout << "hello test" << endl;
-  const char* filePath = "D:/WorkSpace/GraduationProject/2020graduationprojectqijiabao/paper_analysis/paper_analysis/data/label_dict.json";
+  char const* filePath = "D:/WorkSpace/GraduationProject/2020graduationprojectqijiabao/paper_analysis/paper_analysis/data/label_dict.json";
   // 读取文件中的数据
   std::ifstream ifs; // 创建一个 std::ifstream 对象
   ifs.open(filePath, ios::in || ios::binary);
@@ -125,6 +233,7 @@ int main()
   return 0;
 }
 
+#endif
 
 #if 0
 

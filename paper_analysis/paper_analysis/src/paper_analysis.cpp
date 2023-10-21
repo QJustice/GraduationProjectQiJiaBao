@@ -1,5 +1,6 @@
 #include "paper_analysis.h"
 #include <iostream>
+#include <stack>
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/util/OutOfMemoryException.hpp>
@@ -198,7 +199,7 @@ void ergodicTag(XERCES_CPP_NAMESPACE::DOMElement* root)
 
 qi::CPaperAnalysis::CPaperAnalysis()
 {
-  
+
 }
 
 qi::CPaperAnalysis::~CPaperAnalysis()
@@ -215,7 +216,7 @@ qierr::error_code qi::CPaperAnalysis::init()
     XERCES_CPP_NAMESPACE::XMLPlatformUtils::Initialize();
   }
 
-  catch (const XERCES_CPP_NAMESPACE::XMLException& toCatch)
+  catch (XERCES_CPP_NAMESPACE::XMLException const& toCatch)
   {
     char* pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(toCatch.getMessage());
     XERCES_STD_QUALIFIER cerr << "Error during Xerces-c Initialization.\n"
@@ -262,18 +263,18 @@ qierr::error_code qi::CPaperAnalysis::loadXMLFile(char const* file_path)
     // reset document pool
     this->parser_->resetDocumentPool();
 
-    const unsigned long startMillis = XERCES_CPP_NAMESPACE::XMLPlatformUtils::getCurrentMillis();
+     unsigned long const startMillis = XERCES_CPP_NAMESPACE::XMLPlatformUtils::getCurrentMillis();
     doc = this->parser_->parseURI(file_path);
-    const unsigned long endMillis = XERCES_CPP_NAMESPACE::XMLPlatformUtils::getCurrentMillis();
+     unsigned long const endMillis = XERCES_CPP_NAMESPACE::XMLPlatformUtils::getCurrentMillis();
     duration = endMillis - startMillis;
     XERCES_STD_QUALIFIER cout << "Parsed file in " << duration << " ms " << XERCES_STD_QUALIFIER endl;
   }
-  catch (const XERCES_CPP_NAMESPACE::OutOfMemoryException&)
+  catch (XERCES_CPP_NAMESPACE::OutOfMemoryException const&)
   {
     XERCES_STD_QUALIFIER cerr << "OutOfMemoryException" << XERCES_STD_QUALIFIER endl;
     return qierr::E_OUTOFMEM;
   }
-  catch (const XERCES_CPP_NAMESPACE::XMLException& toCatch)
+  catch (XERCES_CPP_NAMESPACE::XMLException const& toCatch)
   {
     char* pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(toCatch.getMessage());
     std::cerr << "An error occurred during parsing\n   Message: "
@@ -281,7 +282,7 @@ qierr::error_code qi::CPaperAnalysis::loadXMLFile(char const* file_path)
     XERCES_CPP_NAMESPACE::XMLString::release(&pMsg);
     return qierr::E_XMLEXCEPTION;
   }
-  catch (const XERCES_CPP_NAMESPACE::DOMException& toCatch)
+  catch (XERCES_CPP_NAMESPACE::DOMException const& toCatch)
   {
     char* pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(toCatch.getMessage());
     std::cerr << "An error occurred during parsing\n   Message: "
@@ -298,7 +299,7 @@ qierr::error_code qi::CPaperAnalysis::loadXMLFile(char const* file_path)
   return qierr::E_OK;
 }
 
-qierr::error_code qi::CPaperAnalysis::getDomElement(XERCES_CPP_NAMESPACE::DOMElement* root)
+qierr::error_code qi::CPaperAnalysis::analysisXMLFile(qi::CTranslationLabel* translation_lable)
 {
   if (!this->doc_)
     return qierr::E_EMPTY;
@@ -306,48 +307,91 @@ qierr::error_code qi::CPaperAnalysis::getDomElement(XERCES_CPP_NAMESPACE::DOMEle
   //XERCES_STD_QUALIFIER cout << "Parsed file: " << pMsg << XERCES_STD_QUALIFIER endl;
   //XERCES_CPP_NAMESPACE::XMLString::release(&pMsg);
   size_t elementCount = 0;
-  root = this->doc_->getDocumentElement();
-  if (root)
-    elementCount = root->getChildElementCount();
+  this->root_ = this->doc_->getDocumentElement();
+  if (this->root_)
+    elementCount = this->root_->getChildElementCount();
   else
     XERCES_STD_QUALIFIER cerr << "can not find root element" << XERCES_STD_QUALIFIER endl;
-  XERCES_STD_QUALIFIER cout  << elementCount << " elements." << XERCES_STD_QUALIFIER endl;
-  this->root_ = root;
+  XERCES_STD_QUALIFIER cout << elementCount << " elements." << XERCES_STD_QUALIFIER endl;
+  this->dfsTraverseXMLTree(this->root_, &qi::CPaperAnalysis::printNodeInfo, translation_lable);
   return qierr::E_OK;
 }
-
-qierr::error_code qi::CPaperAnalysis::getBodyElement(XERCES_CPP_NAMESPACE::DOMElement* body)
+/*
+qierr::errorcode qi::CPaperAnalysis::printNodeInfo(XERCES_CPP_NAMESPACE::DOMNode* node)
 {
-  if (!this->root_)
-    return qierr::E_EMPTY;
-  XMLCh* lable_name = XERCES_CPP_NAMESPACE::XMLString::transcode("w:body");
-  XERCES_CPP_NAMESPACE::DOMNodeList* bodyList = this->root_->getElementsByTagName(lable_name);
-  XERCES_CPP_NAMESPACE::XMLString::release(&lable_name);
-  if (!bodyList)
-  {
-    XERCES_STD_QUALIFIER cerr << "can not find body element" << XERCES_STD_QUALIFIER endl;
-    return qierr::E_EMPTY;
+  XERCES_STD_QUALIFIER cout << "Node Name: " << XERCES_CPP_NAMESPACE::XMLString::transcode(node->getNodeName()) << XERCES_STD_QUALIFIER endl;
+  if (node->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE) {
+    XERCES_CPP_NAMESPACE::DOMNamedNodeMap* attributes = node->getAttributes();
+    if (attributes && attributes->getLength() > 0) {
+      XERCES_STD_QUALIFIER cout << "Attributes: ";
+      for (XMLSize_t i = 0; i < attributes->getLength(); ++i) {
+        XERCES_CPP_NAMESPACE::DOMNode* attribute = attributes->item(i);
+        XERCES_STD_QUALIFIER cout << XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getNodeName()) << "=\""
+          << XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getNodeValue()) << "\n" ;
+      }
+      XERCES_STD_QUALIFIER cout << XERCES_STD_QUALIFIER endl;
+    }
   }
-  if (bodyList->getLength() > 1)
-  {
-    XERCES_STD_QUALIFIER cerr << "more than one body element" << XERCES_STD_QUALIFIER endl;
-    return qierr::E_ILLEGAL;
+  char* nodeValue = XERCES_CPP_NAMESPACE::XMLString::transcode(node->getNodeValue());
+  if (nodeValue && XERCES_CPP_NAMESPACE::XMLString::stringLen(nodeValue) > 0) {
+    XERCES_STD_QUALIFIER cout << "Node Value: " << nodeValue << XERCES_STD_QUALIFIER endl;
   }
-  if (bodyList->getLength() == 0)
-  {
-    XERCES_STD_QUALIFIER cerr << "can not find body element" << XERCES_STD_QUALIFIER endl;
-    return qierr::E_EMPTY;
-  }
-  body = dynamic_cast<XERCES_CPP_NAMESPACE::DOMElement*>(bodyList->item(0));
-  this->body_ = body;
-  return qierr::E_OK;
+  XERCES_CPP_NAMESPACE::XMLString::release(&nodeValue);
+  return qierr::errorcode();
 }
+*/
+//
+//
+//qierr::error_code qi::CPaperAnalysis::getDomElement(XERCES_CPP_NAMESPACE::DOMElement* root)
+//{
+//  if (!this->doc_)
+//    return qierr::E_EMPTY;
+//  //char* pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(doc->getElementsByTagName);
+//  //XERCES_STD_QUALIFIER cout << "Parsed file: " << pMsg << XERCES_STD_QUALIFIER endl;
+//  //XERCES_CPP_NAMESPACE::XMLString::release(&pMsg);
+//  size_t elementCount = 0;
+//  root = this->doc_->getDocumentElement();
+//  if (root)
+//    elementCount = root->getChildElementCount();
+//  else
+//    XERCES_STD_QUALIFIER cerr << "can not find root element" << XERCES_STD_QUALIFIER endl;
+//  XERCES_STD_QUALIFIER cout << elementCount << " elements." << XERCES_STD_QUALIFIER endl;
+//  this->root_ = root;
+//  return qierr::E_OK;
+//}
+//
+//qierr::error_code qi::CPaperAnalysis::getBodyElement(XERCES_CPP_NAMESPACE::DOMElement* body)
+//{
+//  if (!this->root_)
+//    return qierr::E_EMPTY;
+//  XMLCh* lable_name = XERCES_CPP_NAMESPACE::XMLString::transcode("w:body");
+//  XERCES_CPP_NAMESPACE::DOMNodeList* bodyList = this->root_->getElementsByTagName(lable_name);
+//  XERCES_CPP_NAMESPACE::XMLString::release(&lable_name);
+//  if (!bodyList)
+//  {
+//    XERCES_STD_QUALIFIER cerr << "can not find body element" << XERCES_STD_QUALIFIER endl;
+//    return qierr::E_EMPTY;
+//  }
+//  if (bodyList->getLength() > 1)
+//  {
+//    XERCES_STD_QUALIFIER cerr << "more than one body element" << XERCES_STD_QUALIFIER endl;
+//    return qierr::E_ILLEGAL;
+//  }
+//  if (bodyList->getLength() == 0)
+//  {
+//    XERCES_STD_QUALIFIER cerr << "can not find body element" << XERCES_STD_QUALIFIER endl;
+//    return qierr::E_EMPTY;
+//  }
+//  body = dynamic_cast<XERCES_CPP_NAMESPACE::DOMElement*>(bodyList->item(0));
+//  this->body_ = body;
+//  return qierr::E_OK;
+//}
 
 qierr::error_code qi::CPaperAnalysis::printLableProperties(XERCES_CPP_NAMESPACE::DOMNode* node, qi::CTranslationLabel* translation_lable)
 {
   static int level = 0;
   ++level;
-  
+
   if (!this->body_)
     return qierr::E_EMPTY;
   if (!node)
@@ -361,7 +405,7 @@ qierr::error_code qi::CPaperAnalysis::printLableProperties(XERCES_CPP_NAMESPACE:
         XERCES_STD_QUALIFIER cout << "\n\n***** New Lable Properties *****\n\n" << XERCES_STD_QUALIFIER endl;
       char* lable_name = XERCES_CPP_NAMESPACE::XMLString::transcode(current_child->getLocalName());
       XERCES_STD_QUALIFIER cout << "\n" << lable_name << "->";
-      XERCES_STD_QUALIFIER cout << translation_lable->getLabelDescription(lable_name, "Description") << XERCES_STD_QUALIFIER endl;
+      //XERCES_STD_QUALIFIER cout << translation_lable->getLabelDescription(lable_name, "Description") << XERCES_STD_QUALIFIER endl;
       XERCES_CPP_NAMESPACE::DOMNamedNodeMap* attributes = current_child->getAttributes();
       if (attributes)
       {
@@ -370,9 +414,9 @@ qierr::error_code qi::CPaperAnalysis::printLableProperties(XERCES_CPP_NAMESPACE:
         {
           XERCES_CPP_NAMESPACE::DOMNode* attribute = attributes->item(i);
           char* attribute_name = XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getLocalName());
-          XERCES_STD_QUALIFIER cout << attribute_name << "->" << translation_lable->getLabelAttributeDescription(lable_name, attribute_name, "Description") << ":";
+          //XERCES_STD_QUALIFIER cout << attribute_name << "->" << translation_lable->getLabelAttributeDescription(lable_name, attribute_name, "Description") << ":";
           char* attribute_value = XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getNodeValue());
-          XERCES_STD_QUALIFIER cout << attribute_value << "->" << translation_lable->getLabelAttributeDescription(lable_name, attribute_name, attribute_value) << XERCES_STD_QUALIFIER endl;
+          //XERCES_STD_QUALIFIER cout << attribute_value << "->" << translation_lable->getLabelAttributeDescription(lable_name, attribute_name, attribute_value) << XERCES_STD_QUALIFIER endl;
           XERCES_CPP_NAMESPACE::XMLString::release(&attribute_name);
           XERCES_CPP_NAMESPACE::XMLString::release(&attribute_value);
         }
@@ -408,7 +452,7 @@ qierr::error_code qi::CPaperAnalysis::XPathSearch(char const* XPathString)
     XERCES_STD_QUALIFIER cerr << "XPathString is null" << XERCES_STD_QUALIFIER endl;
     return qierr::E_EMPTY;
   }
-  const char* gXPathExpression = XPathString;
+  char const* gXPathExpression = XPathString;
   XMLCh* xpathStr = XERCES_CPP_NAMESPACE::XMLString::transcode(gXPathExpression);
   try
   {
@@ -455,7 +499,7 @@ qierr::error_code qi::CPaperAnalysis::XPathSearch(char const* XPathString)
     result->release();
     resolver->release();
   }
-  catch (const XERCES_CPP_NAMESPACE::DOMXPathException& e)
+  catch ( XERCES_CPP_NAMESPACE::DOMXPathException const& e)
   {
     char* pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(e.getMessage());
     XERCES_STD_QUALIFIER cerr << "An error occurred during processing of the XPath expression. Msg is:"
@@ -464,7 +508,7 @@ qierr::error_code qi::CPaperAnalysis::XPathSearch(char const* XPathString)
     XERCES_CPP_NAMESPACE::XMLString::release(&pMsg);
     return -1;
   }
-  catch (const XERCES_CPP_NAMESPACE::DOMException& e)
+  catch ( XERCES_CPP_NAMESPACE::DOMException const& e)
   {
     char* pMsg = XERCES_CPP_NAMESPACE::XMLString::transcode(e.getMessage());
     XERCES_STD_QUALIFIER cerr << "An error occurred during processing of the XPath expression. Msg is:"
@@ -476,4 +520,108 @@ qierr::error_code qi::CPaperAnalysis::XPathSearch(char const* XPathString)
   XERCES_CPP_NAMESPACE::XMLString::release(&xpathStr);
 
   return qierr::E_OK;
+}
+/*
+qierr::errorcode qi::CPaperAnalysis::dfsTraverseXMLTree(XERCES_CPP_NAMESPACE::DOMNode* root, qierr::errorcode(qi::CPaperAnalysis::*printNodeFun)(XERCES_CPP_NAMESPACE::DOMNode* node))
+{
+  XERCES_STD_QUALIFIER stack<XERCES_CPP_NAMESPACE::DOMNode*> nodeStack;
+  nodeStack.push(root);
+
+  while (!nodeStack.empty()) {
+    XERCES_CPP_NAMESPACE::DOMNode* node = nodeStack.top();
+    nodeStack.pop();
+
+    printNodeInfo(node);
+
+    XERCES_CPP_NAMESPACE::DOMNodeList* children = node->getChildNodes();
+    const XMLSize_t numChildren = children->getLength();
+    //XERCES_STD_QUALIFIER cout << "Children: " << numChildren << XERCES_STD_QUALIFIER endl;
+    for (XMLSize_t i = numChildren - 1; i < numChildren; --i) {
+      XERCES_CPP_NAMESPACE::DOMNode* child = children->item(i);
+      //XERCES_STD_QUALIFIER cout << "Child: " << i << XERCES_CPP_NAMESPACE::XMLString::transcode(child->getNodeName()) << XERCES_STD_QUALIFIER endl;
+      if (child && child->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE) {
+        nodeStack.push(child);
+      }
+    }
+  }
+  return qierr::errorcode();
+}
+*/
+qierr::errorcode qi::CPaperAnalysis::printNodeInfo(XERCES_CPP_NAMESPACE::DOMNode* node, std::string& path, qi::CTranslationLabel* translation_lable)
+{
+  std::string fullPath = path;
+  // char* pNodeName = XERCES_CPP_NAMESPACE::XMLString::transcode(node->getNodeName());
+  char* pNodeName = XERCES_CPP_NAMESPACE::XMLString::transcode(node->getLocalName());
+  XERCES_STD_QUALIFIER cout << "Node Name: " << pNodeName << XERCES_STD_QUALIFIER endl;
+  // fullPath += "$";
+  XERCES_CPP_NAMESPACE::XMLString::release(&pNodeName);
+
+  if (node->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE)
+  {
+    XERCES_CPP_NAMESPACE::DOMNamedNodeMap* attributes = node->getAttributes();
+    char* pAttrName = nullptr;
+    char* pAttrValue = nullptr;
+    if (attributes && attributes->getLength() > 0)
+    {
+      XERCES_STD_QUALIFIER cout << "Attributes: \n";
+      for (XMLSize_t i = 0; i < attributes->getLength(); ++i)
+      {
+        XERCES_CPP_NAMESPACE::DOMNode* attribute = attributes->item(i);
+        // pAttrName = XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getNodeName());
+        // pAttrValue = XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getNodeValue());
+        pAttrName = XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getLocalName());
+        pAttrValue = XERCES_CPP_NAMESPACE::XMLString::transcode(attribute->getNodeValue());
+        XERCES_STD_QUALIFIER cout << "now path: " << fullPath << "$" << pAttrName << XERCES_STD_QUALIFIER endl;
+        
+        XERCES_STD_QUALIFIER cout << pAttrName << "=\"" << pAttrValue << "\n";
+        XERCES_STD_QUALIFIER cout << pAttrName << "->" << "***翻译为：" << translation_lable->findValueByKey(fullPath + "$" + pAttrName) << "=" << pAttrValue << "***\n";
+        XERCES_CPP_NAMESPACE::XMLString::release(&pAttrName);
+        XERCES_CPP_NAMESPACE::XMLString::release(&pAttrValue);
+      }
+      XERCES_STD_QUALIFIER cout << XERCES_STD_QUALIFIER endl;
+    }
+  }
+
+  // XERCES_STD_QUALIFIER cout << "Path: " << fullPath << XERCES_STD_QUALIFIER endl;
+  return qierr::errorcode();
+}
+qierr::errorcode qi::CPaperAnalysis::dfsTraverseXMLTree(XERCES_CPP_NAMESPACE::DOMNode* root, qierr::errorcode(qi::CPaperAnalysis::* printNodeFun)(XERCES_CPP_NAMESPACE::DOMNode* node, XERCES_STD_QUALIFIER string& labelPath, qi::CTranslationLabel* translation_lable), qi::CTranslationLabel* translation_lable)
+{
+  XERCES_STD_QUALIFIER stack<std::pair<XERCES_CPP_NAMESPACE::DOMNode*, std::string>> nodeStack;
+
+  // char* NodeName = XERCES_CPP_NAMESPACE::XMLString::transcode(root->getNodeName());
+  char* NodeName = XERCES_CPP_NAMESPACE::XMLString::transcode(root->getLocalName());
+  XERCES_STD_QUALIFIER string xmlLablePath = XERCES_STD_QUALIFIER string(NodeName);
+  nodeStack.push(std::make_pair(root, xmlLablePath));
+
+  while (!nodeStack.empty())
+  {
+    XERCES_CPP_NAMESPACE::DOMNode* node = nodeStack.top().first;
+    std::string path = nodeStack.top().second;
+    nodeStack.pop();
+
+    (this->*printNodeFun)(node, path, translation_lable);
+    
+    XERCES_CPP_NAMESPACE::DOMNodeList* children = node->getChildNodes();
+    // std::cout << "Children: " << children->getLength() << std::endl;
+    // std::cout << "node path: " << path << std::endl;
+    XMLSize_t const numChildren = children->getLength();
+    for (int i = numChildren - 1; i > 0; --i)
+    {
+      XERCES_CPP_NAMESPACE::DOMNode* child = children->item(i);
+      if (child && child->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE)
+      {
+        // char* pNodeName = XERCES_CPP_NAMESPACE::XMLString::transcode(child->getNodeName());
+        char* pNodeName = XERCES_CPP_NAMESPACE::XMLString::transcode(child->getLocalName());      
+       nodeStack.push(std::make_pair(child, path + "$" + XERCES_STD_QUALIFIER string(pNodeName)));
+        // path += " # " + XERCES_STD_QUALIFIER string(pNodeName);
+        XERCES_CPP_NAMESPACE::XMLString::release(&pNodeName);
+        // XERCES_STD_QUALIFIER cout << "child path: " << nodeStack.top().second << XERCES_STD_QUALIFIER endl;
+      }
+    }
+    XERCES_STD_QUALIFIER cout << XERCES_STD_QUALIFIER endl;
+    XERCES_STD_QUALIFIER cout << XERCES_STD_QUALIFIER endl;
+  }
+
+  return qierr::errorcode();
 }

@@ -32,7 +32,7 @@ typedef int error_code;
 class Error
 {
 public:
-  Error(int value, const std::string& str)
+  Error(int value,  std::string const& str)
   {
     m_value = value;
     m_message = str;

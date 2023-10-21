@@ -10,6 +10,55 @@
 
 qi::CTranslationLabel::CTranslationLabel()
 {
+}
+
+qi::CTranslationLabel::CTranslationLabel(const std::string& filePath) : m_filePath_(filePath)
+{
+}
+
+qierr::error_code qi::CTranslationLabel::loadFile(char const* file_path)
+{
+  this->m_filePath_ = file_path;
+  // 从文件中读取json内容
+  std::ifstream file(m_filePath_);
+  if (!file.is_open()) {
+    std::cout << "Failed to open JSON file" << std::endl;
+    return qierr::E_OPENFAIL;
+  }
+  bool parsingSuccessful = m_reader_.parse(file, this->m_root_);
+  file.close();
+
+  if (!parsingSuccessful) {
+    std::cout << "Failed to parse JSON" << std::endl;
+    return qierr::E_JSONEXCEPTION_CODE;
+  }
+
+  return qierr::E_OK;
+}
+
+
+std::string qi::CTranslationLabel::findValueByKey(const std::string& key)
+{
+  //// 打印全部key和value
+  //Json::Value::Members members = this->m_root_.getMemberNames();
+  //for (auto iter = members.begin(); iter != members.end(); iter++) {
+  //  std::cout << *iter << ": " << this->m_root_[*iter].asString() << std::endl;
+  //}
+
+  // 查找key对应的value
+  if (this->m_root_.isMember(key)) {
+    Json::Value value = this->m_root_[key];
+    if (value.isString()) {
+      return value.asString();
+    }
+  }
+  return  "Key '" + key + "' not found";
+}
+
+#if 0
+
+qi::CTranslationLabel::CTranslationLabel()
+{
   this->root_ = nullptr;
   this->reader_ = nullptr;
 }
@@ -30,7 +79,7 @@ qi::CTranslationLabel::~CTranslationLabel()
 
 qierr::error_code qi::CTranslationLabel::loadFile(char const* file_path)
 {
-  const char* path = file_path;
+  char const* path = file_path;
 
   //读取文件中的数据
   std::ifstream ifs; // 创建一个 std::ifstream 对象
@@ -48,12 +97,12 @@ qierr::error_code qi::CTranslationLabel::loadFile(char const* file_path)
   this->reader_ = new Json::Reader(Json::Features::strictMode());
   if (!reader_)
   {
-    std::cerr << "reader_ is null"<< " ";
+    std::cerr << "reader_ is null" << " ";
     return qierr::E_EMPTY;
   }
   bool ret = this->reader_->parse(ifs, *this->root_);
   if (!ret) {
-    std::cout << "parseJsonFromString error!"<< " ";
+    std::cout << "parseJsonFromString error!" << " ";
     return qierr::E_INITFAIL;
   }
 
@@ -66,23 +115,23 @@ bool qi::CTranslationLabel::belongToMember(char const* member_name, Json::Value*
 {
   if (!node)
   {
-    std::cerr << "node is null"<< " ";
+    std::cerr << "node is null" << " ";
     return false;
   }
   if (!node->isObject())
   {
-    std::cerr << "node is not object. Cannot obtain member " << member_name<< " ";
+    std::cerr << "node is not object. Cannot obtain member " << member_name << " ";
     return false;
   }
   Json::Value::Members members = node->getMemberNames();
   if (members.empty())
   {
-    std::cerr << "members is empty"<< " ";
+    std::cerr << "members is empty" << " ";
     return false;
   }
   if (!node->isMember(member_name))
   {
-    std::cerr << "node is not member " << member_name<< " ";
+    std::cerr << "node is not member " << member_name << " ";
     return false;
   }
   return true;
@@ -93,7 +142,7 @@ std::string qi::CTranslationLabel::getLabelDescription(char const* lable_name, c
   std::string str = "NULL";
   if (!this->root_)
   {
-    std::cerr << "root_ is null"<< " ";
+    std::cerr << "root_ is null" << " ";
     return str;
   }
   if (!belongToMember(lable_name, this->root_))
@@ -113,7 +162,7 @@ std::string qi::CTranslationLabel::getLabelAttributeDescription(char const* labl
   std::string str = "NULL";
   if (!this->root_)
   {
-    std::cerr << "root_ is null"<< " ";
+    std::cerr << "root_ is null" << " ";
     return str;
   }
   if (!belongToMember(lable_name, this->root_))
@@ -139,7 +188,7 @@ std::string qi::CTranslationLabel::getLabelAttributeDescription(char const* labl
   }
   else
   {
-    std::cerr << "value type is not string or object"<< " ";
+    std::cerr << "value type is not string or object" << " ";
     return str;
   }
   return str;
@@ -149,7 +198,7 @@ Json::Value qi::CTranslationLabel::getLabelAttribute(char const* lable_name, cha
 {
   if (!this->root_)
   {
-    std::cerr << "root_ is null"<< " ";
+    std::cerr << "root_ is null" << " ";
     return NULL;
   }
   if (!belongToMember(lable_name, this->root_))
@@ -163,7 +212,7 @@ Json::Value qi::CTranslationLabel::getLabelAttributeValue(char const* lable_name
 {
   if (!this->root_)
   {
-    std::cerr << "root_ is null"<< " ";
+    std::cerr << "root_ is null" << " ";
     return NULL;
   }
   if (!belongToMember(lable_name, this->root_))
@@ -175,3 +224,4 @@ Json::Value qi::CTranslationLabel::getLabelAttributeValue(char const* lable_name
 
   return (*this->root_)[lable_name][lable_attribute][attribute_value];
 }
+#endif
