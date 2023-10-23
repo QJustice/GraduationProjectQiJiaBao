@@ -32,26 +32,30 @@ typedef int error_code;
 class Error
 {
 public:
-  Error(int value,  std::string const& str)
+  Error(int value, std::string const& str)
   {
     m_value = value;
     m_message = str;
+
+    // 检查调试模式下错误值和消息是否匹配
 #ifdef _DEBUG
     ErrorMap::iterator found = GetErrorMap().find(value);
     if (found != GetErrorMap().end())
       assert(found->second == m_message);
 #endif
+
+    // 将错误值和消息存入错误映射表中
     GetErrorMap()[m_value] = m_message;
   }
 
-  // auto-cast Error to integer error code
+  // 将 Error 自动转换为整数类型的错误码
   operator int() { return m_value; }
 
 private:
-  int m_value;
-  std::string m_message;
+  int m_value;  // 错误值
+  std::string m_message;  // 错误消息
 
-  typedef std::map<int, std::string> ErrorMap;
+  typedef std::map<int, std::string> ErrorMap;  // 错误映射表类型
   static ErrorMap& GetErrorMap()
   {
     static ErrorMap errMap;
@@ -60,6 +64,7 @@ private:
 
 public:
 
+  // 根据错误值获取错误消息字符串
   static std::string GetErrorString(int value)
   {
     ErrorMap::iterator found = GetErrorMap().find(value);
@@ -74,6 +79,7 @@ public:
     }
   }
 };
+
 
 enum errorcode {
   E_OK_CODE = 0,         ///< 成功

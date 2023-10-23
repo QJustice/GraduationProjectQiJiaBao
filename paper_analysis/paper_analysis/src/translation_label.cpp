@@ -18,16 +18,21 @@ qi::CTranslationLabel::CTranslationLabel(const std::string& filePath) : m_filePa
 
 qierr::error_code qi::CTranslationLabel::loadFile(char const* file_path)
 {
+  // 设置文件路径
   this->m_filePath_ = file_path;
+
   // 从文件中读取json内容
   std::ifstream file(m_filePath_);
   if (!file.is_open()) {
     std::cout << "Failed to open JSON file" << std::endl;
     return qierr::E_OPENFAIL;
   }
+
+  // 解析json内容
   bool parsingSuccessful = m_reader_.parse(file, this->m_root_);
   file.close();
 
+  // 检查解析是否成功
   if (!parsingSuccessful) {
     std::cout << "Failed to parse JSON" << std::endl;
     return qierr::E_JSONEXCEPTION_CODE;
@@ -36,24 +41,20 @@ qierr::error_code qi::CTranslationLabel::loadFile(char const* file_path)
   return qierr::E_OK;
 }
 
-
 std::string qi::CTranslationLabel::findValueByKey(const std::string& key)
 {
-  //// 打印全部key和value
-  //Json::Value::Members members = this->m_root_.getMemberNames();
-  //for (auto iter = members.begin(); iter != members.end(); iter++) {
-  //  std::cout << *iter << ": " << this->m_root_[*iter].asString() << std::endl;
-  //}
-
   // 查找key对应的value
   if (this->m_root_.isMember(key)) {
     Json::Value value = this->m_root_[key];
+    // 检查value是否为字符串类型
     if (value.isString()) {
       return value.asString();
     }
   }
+  // 如果找不到对应的value，则返回提示信息
   return  "Key '" + key + "' not found";
 }
+
 
 #if 0
 

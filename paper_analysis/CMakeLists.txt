@@ -11,5 +11,16 @@ endif()
 
 project ("paper_analysis")
 
+# 设置编码
+if(WIN32)
+  # 设置Windows平台的编码为UTF-8
+  add_definitions(-DUNICODE -D_UNICODE)
+  # 设置Windows平台的默认字符集为UTF-8
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
+elseif(UNIX)
+  # 设置Unix平台的编码为UTF-8
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -finput-charset=UTF-8 -fexec-charset=UTF-8")
+endif()
+
 # 包含子项目。
 add_subdirectory ("paper_analysis")

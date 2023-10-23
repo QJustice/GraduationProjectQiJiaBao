@@ -34,14 +34,18 @@ set(SOURCE
   "header/config.h"
 	"header/config.inc"
 	"header/translation_label.h"
+  "header/analysis_XML_file.h"
+  "header/singal_mutex.h"
 
 	"src/paper_analysis.cpp"
 	"src/translation_label.cpp"
   "src/error_code.cpp"
-  "src/main.cpp")
+  "src/main.cpp"
+  "src/analysis_XML_file.cpp"
+  "src/singal_mutex.cpp")
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (${PROJECT_NAME} ${SOURCE} "header/config.h" "src/error_code.cpp" "src/main.cpp")
+add_executable (${PROJECT_NAME} ${SOURCE})
 
 # link_libraries(${XercesC_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${XercesC_LIBRARIES})
