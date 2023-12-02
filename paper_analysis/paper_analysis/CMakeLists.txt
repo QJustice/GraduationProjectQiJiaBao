@@ -3,58 +3,81 @@
 #
 
 # set XercesC_DIR to the path of the Xerces-C cmake directory
-set (XercesC_DIR "C:/Program Files/xerces-c/cmake/")
-set (jsoncpp_DIR "C:/Program Files/jsoncpp/lib/cmake/jsoncpp")
-set (jsoncpp_LIBRARIES "jsoncpp_lib")
-set (jsoncpp_INCLUDE_DIRS "C:/Program Files/jsoncpp/include/")
+if (MSVC)
+    set(XercesC_DIR "D:/LocalRepository/msvc_64/xerces-c/cmake/")
+    set(jsoncpp_DIR "D:/LocalRepository/msvc_64/jsoncpp/lib/cmake/jsoncpp/")
+    set(jsoncpp_LIBRARIES "jsoncpp_lib")
+    set(jsoncpp_INCLUDE_DIRS "D:/LocalRepository/msvc_64/jsoncpp/include/")
+    set(GTest_DIR "D:/LocalRepository/msvc_64/googletest-distribution/lib/cmake/GTest/")
+    set(GTest_INCLUDE_DIRS "D:/LocalRepository/msvc_64/googletest-distribution/include/")
+    set(GMOCK_LIBRARIES "GTest::gmock")
+elseif (MINGW)
+    set(XercesC_DIR "D:/LocalRepository/mingw_64/xerces-c/cmake/")
+    set(jsoncpp_DIR "D:/LocalRepository/mingw_64/jsoncpp/lib/cmake/jsoncpp/")
+    set(jsoncpp_LIBRARIES "jsoncpp_lib")
+    set(jsoncpp_INCLUDE_DIRS "D:/LocalRepository/mingw_64/jsoncpp/include/")
+    set(GTest_DIR "D:/LocalRepository/mingw_64/googletest-distribution/lib/cmake/GTest/")
+    set(GTest_INCLUDE_DIRS "D:/LocalRepository/mingw_64/googletest-distribution/include/")
+    set(GMOCK_LIBRARIES "GTest::gmock")
+endif ()
 
+find_package(GTest REQUIRED)
 find_package(XercesC CONFIG REQUIRED)
-find_package (jsoncpp CONFIG REQUIRED)
+find_package(jsoncpp CONFIG REQUIRED)
 
-message ("XercesC_INCLUDE_DIRS: " ${XercesC_INCLUDE_DIRS})
-message ("XercesC_LIBRARIES: " ${XercesC_LIBRARIES})
-message ("XercesC_VERSION: " ${XercesC_VERSION})
-message ("XercesC_FOUND: " ${XercesC_FOUND})
-message ("XercesC_PATH: " ${XercesC_DIR})
+message(STATUS "GTEST_BOTH_LIBRARIES: " ${GTEST_BOTH_LIBRARIES})
+message(STATUS "GTEST_LIBRARIES: " ${GTEST_LIBRARIES})
+message(STATUS "GTEST_MAIN_LIBRARIES: " ${GTEST_MAIN_LIBRARIES})
+message(STATUS "GTEST_INCLUDE_DIRS: " ${GTEST_INCLUDE_DIRS})
+message(STATUS "GMOCK_LIBRARIES: " ${GMOCK_LIBRARIES})
 
-message(STATUS "jsoncpp_INCLUDE_DIRS: ${jsoncpp_INCLUDE_DIRS}")
-message(STATUS "jsoncpp_LIBRARIES: ${jsoncpp_LIBRARIES}")
-message(STATUS "jsoncpp_VERSION: ${jsoncpp_VERSION}")
-message(STATUS "jsoncpp_FOUND: ${jsoncpp_FOUND}")
-message(STATUS "jsoncpp_DIR: ${jsoncpp_DIR}")
+message(STATUS "XercesC_INCLUDE_DIRS: " ${XercesC_INCLUDE_DIRS})
+message(STATUS "XercesC_LIBRARIES: " ${XercesC_LIBRARIES})
+message(STATUS "XercesC_VERSION: " ${XercesC_VERSION})
+message(STATUS "XercesC_FOUND: " ${XercesC_FOUND})
+message(STATUS "XercesC_PATH: " ${XercesC_DIR})
+
+message(STATUS "Jsoncpp_INCLUDE_DIRS: ${jsoncpp_INCLUDE_DIRS}")
+message(STATUS "Jsoncpp_LIBRARIES: ${jsoncpp_LIBRARIES}")
+message(STATUS "Jsoncpp_VERSION: ${jsoncpp_VERSION}")
+message(STATUS "Jsoncpp_FOUND: ${jsoncpp_FOUND}")
+message(STATUS "Jsoncpp_DIR: ${jsoncpp_DIR}")
 
 # 输出cmake版本
 message(STATUS "cmake version: ${CMAKE_VERSION}")
 
-include_directories("header")
+include_directories("include")
+include_directories(${GTEST_INCLUDE_DIRS})
 
 set(SOURCE
-	"header/paper_analysis.h"
-  "header/error_code.h"
-  "header/config.h"
-	"header/config.inc"
-	"header/translation_label.h"
-  "header/analysis_XML_file.h"
-  "header/singal_mutex.h"
+        "include/paper_analysis.h"
+        "include/error_code.h"
+        "include/config.h"
+        "include/config.inc"
+        "include/translation_label.h"
+        "include/analysis_XML_file.h"
+        "include/singal_mutex.h"
 
-	"src/paper_analysis.cpp"
-	"src/translation_label.cpp"
-  "src/error_code.cpp"
-  "src/main.cpp"
-  "src/analysis_XML_file.cpp"
-  "src/singal_mutex.cpp")
+        "src/paper_analysis.cpp"
+        "src/translation_label.cpp"
+        "src/error_code.cpp"
+        "src/main.cpp"
+        "src/analysis_XML_file.cpp"
+        "src/singal_mutex.cpp")
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (${PROJECT_NAME} ${SOURCE})
+add_executable(${PROJECT_NAME} ${SOURCE})
 
-# link_libraries(${XercesC_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${XercesC_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${jsoncpp_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${GMOCK_LIBRARIES})
 
 add_subdirectory("test")
+enable_testing()
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET paper_analysis PROPERTY CXX_STANDARD 20)
-endif()
+    set_property(TARGET paper_analysis PROPERTY CXX_STANDARD 20)
+endif ()
 
 # TODO: 如有需要，请添加测试并安装目标。

@@ -338,10 +338,8 @@ qierr::errorcode qi::CAnalysisXMLFile::dfsTraverseXMLTree(XERCES_CPP_NAMESPACE::
     XERCES_CPP_NAMESPACE::DOMNode* node = nodeStack.top().first;
     std::string path = nodeStack.top().second;
     nodeStack.pop();
-
     // 调用打印节点信息函数
     // (this->*printNodeFun)(node, path, translation_lable);
-
     // 获取子节点列表
     XERCES_CPP_NAMESPACE::DOMNodeList* children = node->getChildNodes();
     XMLSize_t const numChildren = children->getLength();
@@ -352,19 +350,15 @@ qierr::errorcode qi::CAnalysisXMLFile::dfsTraverseXMLTree(XERCES_CPP_NAMESPACE::
       {
         // 获取子节点名称
         char* pNodeName = XERCES_CPP_NAMESPACE::XMLString::transcode(child->getLocalName());
-
         // 将子节点和路径压入节点栈
         nodeStack.push(std::make_pair(child, path + "$" + XERCES_STD_QUALIFIER string(pNodeName)));
-
         // 释放字符串内存
         XERCES_CPP_NAMESPACE::XMLString::release(&pNodeName);
       }
     }
-
     XERCES_STD_QUALIFIER cout << XERCES_STD_QUALIFIER endl;
     XERCES_STD_QUALIFIER cout << XERCES_STD_QUALIFIER endl;
   }
-
   return qierr::errorcode();
 }
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document>
+    <w:body>
+        <w:p w14:paraId="44EEC029" w14:textId="6999EA0A" w:rsidR="00C05CE4" w:rsidRDefault="00C05CE4"
+             w:rsidP="00C05CE4">
+            <w:pPr xmlns:w="http://www.example.com/ns">
+                <w:pStyle w:val="Heading1"/>
+                w:pStyle->w:val=Heading1
+                w:spacing->w:line=240
+                w:spacing->w:lineRule=auto
+                w:jc->w:val=center
+                <w:spacing w:line="240" w:lineRule="auto"/>
+                <w:jc w:val="center"/>
+            </w:pPr>
+            <w:r>
+                <w:rPr>
+                    <w:rFonts w:hint="eastAsia"/>
+                    w:rFonts->w:hint=eastAsia
+                </w:rPr>
+                <w:t>标题1</w:t>
+            </w:r>
+            <w:r>
+                <w:rPr>
+                    <w:rFonts w:hint="eastAsia"/>
+                    w:rFonts->w:hint=eastAsia
+                </w:rPr>
+                <w:t>标题2</w:t>
+            </w:r>
+        </w:p>
+    </w:body>
+</w:document>

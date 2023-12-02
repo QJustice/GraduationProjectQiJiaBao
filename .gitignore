@@ -1,3 +1,5 @@
 /paper_analysis/.vs/
-/paper_analysis/out
+/paper_analysis/.idea/
+/paper_analysis/cmake-build-debug/
+/paper_analysis/out/
 /paper_analysis/CMakePresets.json
