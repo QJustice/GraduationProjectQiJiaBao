@@ -25,21 +25,25 @@
 #ifndef PAPER_ANALYSIS_STRINGEXTRACTOR_H
 #define PAPER_ANALYSIS_STRINGEXTRACTOR_H
 
-
 #include <string>
 #include <vector>
 
 class StringExtractor {
 private:
-  // 存储上一次提取的字符串结尾两个字符
+  // 标记有{{
+  bool leftBraceTwo_ = false;
+  // 标记有{
+  bool leftBraceOne_ = false;
+  // 存储{{后的字符串
+  std::string leftBraceAfterString_;
 public:
-    StringExtractor();
-    ~StringExtractor();
+  StringExtractor();
+  ~StringExtractor();
 
-    std::vector<std::string> extractStrings(const std::string& input);
+  std::vector<std::string> extractStrings(const std::string& input);
 
 private:
-    // 你可以在这里添加其他私有成员或方法，如果需要的话
+  // 你可以在这里添加其他私有成员或方法，如果需要的话
 };
 
 
