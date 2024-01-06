@@ -22,11 +22,3 @@
 // Include necessary headers, if any
 
 // Additional comments or code go here
-
-#include <iostream>
-
-int main()
-{
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
-}

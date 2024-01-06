@@ -1,11 +1,8 @@
-
-project("my_test")
-
-
 include(CTest)
 include(GoogleTest)
 
-add_subdirectory("ParagraphPropertiesTest")
-add_subdirectory("RunPropertiesTest")
-add_subdirectory("ParagraphParserTest")
 
+add_subdirectory(Paragraphs)
+add_subdirectory(Document)
+add_subdirectory(Template)
+add_subdirectory(StringExtractor)

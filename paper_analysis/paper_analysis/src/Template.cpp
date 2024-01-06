@@ -3,7 +3,7 @@
 //
 /*************************************************************************
  * @Project:     paper_analysis
- * @File:        main.cpp
+ * @File:        Template.cpp
  * @Brief:       Brief description of the file
  * @Author:      qijiabao
  * @Contact:     Your Contact Information (e.g., email)
@@ -21,12 +21,28 @@
  ************************************************************************/
 // Include necessary headers, if any
 
-// Additional comments or code go here
+// Additional comments or code go here#include "Template.h"
 
-#include <iostream>
+#include "Template.h"
 
-int main()
+namespace qi {
+std::vector<TemplateBlock> qi::Template::getTemplateBlock()
 {
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
+  return templateBlockVector_;
 }
+bool Template::addTemplateBlock(const TemplateBlock &templateBlock)
+{
+  templateBlockVector_.push_back(templateBlock);
+  return true;
+}
+bool Template::clearTemplateBlock()
+{
+  templateBlockVector_.clear();
+  return true;
+}
+// 模板分析
+bool Template::AnalysisTemplate(const std::string &path)
+{
+  return false;
+}
+}// namespace qi

@@ -3,7 +3,7 @@
 //
 /*************************************************************************
  * @Project:     paper_analysis
- * @File:        main.cpp
+ * @File:        Document.h
  * @Brief:       Brief description of the file
  * @Author:      qijiabao
  * @Contact:     Your Contact Information (e.g., email)
@@ -21,12 +21,45 @@
  ************************************************************************/
 // Include necessary headers, if any
 
-// Additional comments or code go here
+// Additional comments or code go here#ifndef PAPER_ANALYSIS_DOCUMENT_H
+#ifndef PAPER_ANALYSIS_DOCUMENT_H
+#define PAPER_ANALYSIS_DOCUMENT_H
 
-#include <iostream>
+#include <string>
+#include <vector>
 
-int main()
-{
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
-}
+#include "Paragraph.h"
+#include "Template.h"
+namespace qi {
+
+// 段落块信息
+struct  ParagraphBlock{
+  // 段落标记字
+  std::string ParagraphKey = "null";
+  // 段落块集合
+  std::vector<Paragraph> ParagraphsVector;
+};
+
+class Document {
+private:
+  // 模板信息
+  Template documentTemplate_;
+  std::vector<ParagraphBlock> paragraphBlockVector_;
+public:
+  Document() = default;
+  ~Document() = default;
+  // open document
+  bool Open(const std::string& path);
+  // get paragraphvector
+  std::vector<ParagraphBlock> getParagraphVetor();
+  // get section
+  // Section getSection();
+  // get table
+  // Table getTable();
+  // get document information
+  // ??? getDocumentInfo();
+};
+
+}// namespace qi
+
+#endif//PAPER_ANALYSIS_DOCUMENT_H

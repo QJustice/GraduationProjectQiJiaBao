@@ -3,7 +3,7 @@
 //
 /*************************************************************************
  * @Project:     paper_analysis
- * @File:        main.cpp
+ * @File:        Document.cpp
  * @Brief:       Brief description of the file
  * @Author:      qijiabao
  * @Contact:     Your Contact Information (e.g., email)
@@ -21,12 +21,22 @@
  ************************************************************************/
 // Include necessary headers, if any
 
-// Additional comments or code go here
+// Additional comments or code go here#include "Document.h"
 
-#include <iostream>
+#include "Document.h"
 
-int main()
+namespace qi {
+
+bool qi::Document::Open(const std::string &path)
 {
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
+  return false;
 }
+Paragraphs Document::getParagraphs()
+{
+  return Paragraphs();
+}
+bool Document::AnalysisTemplate(const std::string &path)
+{
+  return false;
+}
+}// namespace qi

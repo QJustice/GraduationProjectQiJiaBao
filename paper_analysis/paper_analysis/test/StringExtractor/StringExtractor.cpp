@@ -3,7 +3,7 @@
 //
 /*************************************************************************
  * @Project:     paper_analysis
- * @File:        main.cpp
+ * @File:        StringExtractor.cpp
  * @Brief:       Brief description of the file
  * @Author:      qijiabao
  * @Contact:     Your Contact Information (e.g., email)
@@ -22,11 +22,33 @@
 // Include necessary headers, if any
 
 // Additional comments or code go here
+#include "StringExtractor.h"
 
-#include <iostream>
+#include "StringExtractor.h"
+#include <regex>
 
-int main()
-{
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
+StringExtractor::StringExtractor() {}
+
+StringExtractor::~StringExtractor() {}
+
+std::vector<std::string> StringExtractor::extractStrings(const std::string& input) {
+    std::vector<std::string> result;
+
+    // 使用正则表达式进行匹配
+    std::regex patternAll(R"(\{\{([^}]+)\}\})");
+    std::smatch match;
+
+    // 在输入字符串中搜索匹配项
+    std::string::const_iterator searchStart(input.cbegin());
+    while (std::regex_search(searchStart, input.cend(), match, patternAll))
+    {
+        // 将匹配到的子字符串添加到结果向量中
+        result.push_back(match[1].str());
+
+        // 将搜索位置移到下一个可能的匹配位置
+        searchStart = match.suffix().first;
+    }
+    std::regex patternLeftOne(R"({\{([^{}]+))");
+    std::regex patternLeftTwo(R"(\{\{([^{}]+))");
+    return result;
 }

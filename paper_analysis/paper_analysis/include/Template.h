@@ -3,7 +3,7 @@
 //
 /*************************************************************************
  * @Project:     paper_analysis
- * @File:        main.cpp
+ * @File:        Template.h
  * @Brief:       Brief description of the file
  * @Author:      qijiabao
  * @Contact:     Your Contact Information (e.g., email)
@@ -23,10 +23,42 @@
 
 // Additional comments or code go here
 
-#include <iostream>
+#ifndef PAPER_ANALYSIS_TEMPLATE_H
+#define PAPER_ANALYSIS_TEMPLATE_H
 
-int main()
-{
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
-}
+#include <string>
+#include <vector>
+
+namespace qi {
+
+// 模板信息
+struct TemplateBlock {
+  // 块编号
+  int BlockNum = 0;
+  // 标记字
+  std::string TemplateKey = "null";
+  // 标记字格式
+  // TODO: 标记字格式
+  // 标记字块格式
+  // TODO: 标记字块格式
+};
+// 模板
+class Template {
+private:
+  // 保存模板信息
+  std::vector<TemplateBlock> templateBlockVector_;
+
+public:
+  // get templateblock
+  std::vector<TemplateBlock> getTemplateBlock();
+  // add templateblock
+  bool addTemplateBlock(const TemplateBlock& templateBlock);
+  // clear templateblock
+  bool clearTemplateBlock();
+
+  bool AnalysisTemplate(const std::string& path);
+};
+
+}// namespace qi
+
+#endif//PAPER_ANALYSIS_TEMPLATE_H
