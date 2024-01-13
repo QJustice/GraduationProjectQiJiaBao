@@ -25,18 +25,52 @@
 
 #include "Document.h"
 
-namespace qi {
+#include <iostream>
+#include <xercesc/dom/DOMImplementation.hpp>
+#include <xercesc/dom/DOMImplementationLS.hpp>
+#include <xercesc/dom/DOMImplementationRegistry.hpp>
+#include <xercesc/dom/DOMNamedNodeMap.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 
-bool qi::Document::Open(const std::string &path)
+namespace qi {
+Document::Document()
 {
-  return false;
+  // 设置解析器 Val_Never 为从不验证
+  parser_.setValidationScheme(XERCES_CPP_NAMESPACE::XercesDOMParser::Val_Never);
 }
-Paragraphs Document::getParagraphs()
+Document::~Document()
 {
-  return Paragraphs();
+  // 释放解析器
+
 }
-bool Document::AnalysisTemplate(const std::string &path)
+// 打开文档
+ErrorCode::ErrorCodeEnum Document::Open(const std::string &path)
 {
-  return false;
+  // 解析 XML 文件
+  parser_.parse(path.c_str());
+  // 获取文档
+  document_ = parser_.getDocument();
+
+  return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+// 获取段落块集合
+ErrorCode::ErrorCodeEnum Document::getParagraphVetor(std::vector<ParagraphBlock> &paragraphBlockVector)
+{
+  // char* 转 XMLCh*
+  XMLCh *tempString = XERCES_CPP_NAMESPACE::XMLString::transcode("w:p");
+  // 获取w:document的w:body的w:p集合
+  XERCES_CPP_NAMESPACE::DOMNodeList *paragraphNodeList = document_->getElementsByTagName(tempString);
+  // 释放内存
+  XERCES_CPP_NAMESPACE::XMLString::release(&tempString);
+  // 遍历w:p集合
+  for (XMLSize_t i = 0; i < paragraphNodeList->getLength(); ++i)
+  {
+    // 获取w:p
+    XERCES_CPP_NAMESPACE::DOMNode *paragraphNode = paragraphNodeList->item(i);
+    // 打印w:p里面的内容
+    std::cout << XERCES_CPP_NAMESPACE::XMLString::transcode(paragraphNode->getTextContent()) << std::endl;
+  }
+  paragraphBlockVector = paragraphBlockVector_;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 }// namespace qi

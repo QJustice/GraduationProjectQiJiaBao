@@ -26,11 +26,13 @@
 #ifndef PAPER_ANALYSIS_PARAGRAPHS_H
 #define PAPER_ANALYSIS_PARAGRAPHS_H
 
+#include <xercesc/dom/DOMElement.hpp>
+
 namespace qi {
 
 class Paragraphs {
 private:
-  // ??? getParagraphProperties();
+   XERCES_CPP_NAMESPACE::DOMElement getParagraphProperties();
 public:
   Paragraphs() = default;
   ~Paragraphs() = default;

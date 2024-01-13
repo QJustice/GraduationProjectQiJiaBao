@@ -25,8 +25,20 @@
 
 #include <iostream>
 
+#include <xercesc/util/PlatformUtils.hpp>
+#include "Document.h"
+
 int main()
 {
-  std::cout << "Hello, World!" << std::endl;
+  // 初始化 Xerces-C++
+  XERCES_CPP_NAMESPACE::XMLPlatformUtils::Initialize();
+  {
+    qi::Document document;
+    document.Open("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\document.xml");
+    std::vector<qi::ParagraphBlock> paragraphBlockVector;
+    document.getParagraphVetor(paragraphBlockVector);
+  }
+  // 释放 Xerces-C++
+  XERCES_CPP_NAMESPACE::XMLPlatformUtils::Terminate();
   return 0;
 }

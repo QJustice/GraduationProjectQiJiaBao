@@ -12,7 +12,7 @@ if (MSVC)
     set(GTest_DIR "D:/LocalRepository/msvc_64/googletest-distribution/lib/cmake/GTest/")
     set(GTest_INCLUDE_DIRS "D:/LocalRepository/msvc_64/googletest-distribution/include/")
     include_directories("D:/LocalRepository/msvc_64/minidocx/include")
-    set(minidocx_LIBRARIES "D:/LocalRepository/msvc_64/minidocx/lib/libminidocx.lib")
+    set(minidocx_LIBRARIES "D:/LocalRepository/msvc_64/minidocx/lib/minidocx.lib")
 elseif (MINGW)
     set(XercesC_DIR "D:/LocalRepository/mingw_64/xerces-c/cmake/")
     set(duckx_DIR "D:/LocalRepository/mingw_64/duckx/lib/cmake/duckx/")
@@ -41,10 +41,16 @@ set(SOURCE
         include/Document.h
         include/Paragraph.h
         include/Template.h
+        include/ErrorCode.h
+        include/StringExtractor.h
+        include/CommandParser.h
         src/main.cpp
         src/Document.cpp
         src/Paragraph.cpp
         src/Template.cpp
+        src/ErrorCode.cpp
+        src/StringExtractor.cpp
+        src/CommandParser.cpp
 )
 
 # 将源代码添加到此项目的可执行文件。

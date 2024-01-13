@@ -24,102 +24,126 @@
 // Additional comments or code go here
 
 
-#include "StringExtractor.h"
 #include <iostream>
 
-int main() {
-    // 创建 StringExtractor 对象
-    StringExtractor extractor;
+#include "StringExtractor.h"
+#include <iostream>
+#include <algorithm>
+#include <cctype>
+#include <string>
 
-    // 测试用例 1
-    std::string input1 = "This is a {{test}} string with {{''}} is this kind of string.";
-    std::vector<std::string> result1 = extractor.extractStrings(input1);
+int main()
+{
+  // 创建 StringExtractor 对象
+  qi::StringExtractor extractor;
 
-    std::cout << "Test Case 1:" << std::endl;
-    for (const auto& str : result1) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
+  // 测试用例 1
+  std::string input1 = "This is a {{test}} string with {{''}} is this kind of string.";
+  std::vector<std::string> result1 = extractor.extractStrings(input1);
 
-    // 测试用例 2
-    std::string input2 = "{{One}} {{Two}} {{Three}}";
-    std::vector<std::string> result2 = extractor.extractStrings(input2);
+  std::cout << "Test Case 1:" << std::endl;
+  for (const auto& str: result1)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
 
-    std::cout << "Test Case 2:" << std::endl;
-    for (const auto& str : result2) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
+  // 测试用例 2
+  std::string input2 = "{{One}} {{Two}} {{Three}}";
+  std::vector<std::string> result2 = extractor.extractStrings(input2);
 
-    // 测试用例 3
-    std::string input3 = "This is a {{test}}, and {{invalid}} placeholder.";
-    std::vector<std::string> result3 = extractor.extractStrings(input3);
+  std::cout << "Test Case 2:" << std::endl;
+  for (const auto& str: result2)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
 
-    std::cout << "Test Case 3:" << std::endl;
-    for (const auto& str : result3) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
+  // 测试用例 3
+  std::string input3 = "This is a {{test}}, and {{invalid}} placeholder.";
+  std::vector<std::string> result3 = extractor.extractStrings(input3);
 
-    // 测试用例 4
-    std::string input4 = "This is a {{abc}}, and {{good}} plac{{eholder.{{my {{ god";
-    std::vector<std::string> result4 = extractor.extractStrings(input4);
+  std::cout << "Test Case 3:" << std::endl;
+  for (const auto& str: result3)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
 
-    std::cout << "Test Case 4:" << std::endl;
-    for (const auto& str : result4) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
+  // 测试用例 4
+  std::string input4 = "This is a {{abc}}, and {{good}} plac{{eholder.{{my {{ god";
+  std::vector<std::string> result4 = extractor.extractStrings(input4);
 
-    // 测试用例 5
-    std::string input5 = "}} so good.";
-    std::vector<std::string> result5 = extractor.extractStrings(input5);
+  std::cout << "Test Case 4:" << std::endl;
+  for (const auto& str: result4)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
 
-    std::cout << "Test Case 5:" << std::endl;
-    for (const auto& str : result5) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
+  // 测试用例 5
+  std::string input5 = "}} so good.";
+  std::vector<std::string> result5 = extractor.extractStrings(input5);
 
-    // 测试用例 6
-    std::string input6 = "12{{3}}45{{6}}789";
-    std::vector<std::string> result6 = extractor.extractStrings(input6);
+  std::cout << "Test Case 5:" << std::endl;
+  for (const auto& str: result5)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
 
-    std::cout << "Test Case 6:" << std::endl;
-    for (const auto& str : result6) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
+  // 测试用例 6
+  std::string input6 = "12{{3}}45{{6}}789";
+  std::vector<std::string> result6 = extractor.extractStrings(input6);
 
-    // 测试用例 7
-    std::string input7 = "12{{3}}45{{6}}789{";
-    std::vector<std::string> result7 = extractor.extractStrings(input7);
+  std::cout << "Test Case 6:" << std::endl;
+  for (const auto& str: result6)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
 
-    std::cout << "Test Case 7:" << std::endl;
-    for (const auto& str : result7) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
+  // 测试用例 7
+  std::string input7 = "12{{3}}45{{6}}789{";
+  std::vector<std::string> result7 = extractor.extractStrings(input7);
 
-    // 测试用例 8
-    std::string input8 = "{one}}abc{{two}}ok{";
-    std::vector<std::string> result8 = extractor.extractStrings(input8);
+  std::cout << "Test Case 7:" << std::endl;
+  for (const auto& str: result7)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
 
-    std::cout << "Test Case 8:" << std::endl;
-    for (const auto& str : result8) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
+  // 测试用例 8
+  std::string input8 = "{one}}abc{{第二}}ok{";
+  std::vector<std::string> result8 = extractor.extractStrings(input8);
 
-    // 测试用例 9
-    std::string input9 = "{one abc two ok}";
-    std::vector<std::string> result9 = extractor.extractStrings(input9);
+  std::cout << "Test Case 8:" << std::endl;
+  for (const auto& str: result8)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
 
-    std::cout << "Test Case 9:" << std::endl;
-    for (const auto& str : result9) {
-        std::cout << "Extracted: " << str << std::endl;
-    }
-    std::cout << std::endl;
-    return 0;
+  // 测试用例 9
+  std::string input9 = "{one abc two ok}";
+  std::vector<std::string> result9 = extractor.extractStrings(input9);
+
+  std::cout << "Test Case 9:" << std::endl;
+  for (const auto& str: result9)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+
+  // 测试用例 10
+  std::string input10 = "\n            \n                \n                \n                \n                \n                \n                \n                \n                    \n                    \n                    \n                \n            \n            \n                \n                    \n                    \n                    \n                    \n                \n                {{\n            \n            \n                \n                    \n                    \n                    \n                    \n                \n                123\n            \n            \n                \n                    \n                    \n                    \n                    \n                \n                }}\n            \n        ";
+  extractor.setClearSpaceAndNewLine(true);
+  std::vector<std::string> result10 = extractor.extractStrings(input10);
+  std::cout << "Test Case 10:" << std::endl;
+  for (const auto& str: result10)
+  {
+    std::cout << "Extracted: " << str << std::endl;
+  }
+  std::cout << std::endl;
+  return 0;
 }
-

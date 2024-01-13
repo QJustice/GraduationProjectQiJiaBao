@@ -27,13 +27,18 @@
 
 #include <string>
 #include <vector>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMLSParser.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
 
+#include "ErrorCode.h"
 #include "Paragraph.h"
 #include "Template.h"
+
 namespace qi {
 
 // 段落块信息
-struct  ParagraphBlock{
+struct ParagraphBlock {
   // 段落标记字
   std::string ParagraphKey = "null";
   // 段落块集合
@@ -42,16 +47,23 @@ struct  ParagraphBlock{
 
 class Document {
 private:
+  // DOM 解析器
+  XERCES_CPP_NAMESPACE::DOMLSParser* parser_;
+  // 文档
+  XERCES_CPP_NAMESPACE::DOMDocument* document_;
+
   // 模板信息
   Template documentTemplate_;
+  // 段落块集合
   std::vector<ParagraphBlock> paragraphBlockVector_;
+
 public:
-  Document() = default;
-  ~Document() = default;
+  Document();
+  ~Document();
   // open document
-  bool Open(const std::string& path);
+  ErrorCode::ErrorCodeEnum Open(const std::string& path);
   // get paragraphvector
-  std::vector<ParagraphBlock> getParagraphVetor();
+  ErrorCode::ErrorCodeEnum getParagraphVetor(std::vector<ParagraphBlock>& paragraphBlockVector);
   // get section
   // Section getSection();
   // get table
