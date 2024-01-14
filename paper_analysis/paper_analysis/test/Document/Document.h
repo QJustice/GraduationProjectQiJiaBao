@@ -28,11 +28,11 @@
 #include <string>
 #include <vector>
 #include <xercesc/dom/DOMElement.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/dom/DOMLSParser.hpp>
 
+#include "ErrorCode.h"
 #include "Paragraph.h"
 #include "Template.h"
-#include "ErrorCode.h"
 
 namespace qi {
 
@@ -47,7 +47,7 @@ struct ParagraphBlock {
 class Document {
 private:
   // DOM 解析器
-  XERCES_CPP_NAMESPACE::XercesDOMParser parser_;
+  XERCES_CPP_NAMESPACE::DOMLSParser* documentParser_;
   // 文档
   XERCES_CPP_NAMESPACE::DOMDocument* document_;
 
@@ -60,7 +60,7 @@ public:
   Document();
   ~Document();
   // open document
-  ErrorCode::ErrorCodeEnum Open(const std::string& path);
+  ErrorCode::ErrorCodeEnum openDocument(const std::string& documentFilePath);
   // get paragraphvector
   ErrorCode::ErrorCodeEnum getParagraphVetor( std::vector<ParagraphBlock>& paragraphBlockVector);
   // get section

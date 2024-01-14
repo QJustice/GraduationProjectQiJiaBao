@@ -36,7 +36,7 @@ namespace qi {
 Document::Document()
 {
   // 设置解析器 Val_Never 为从不验证
-  parser_.setValidationScheme(XERCES_CPP_NAMESPACE::XercesDOMParser::Val_Never);
+  documentParser_.setValidationScheme(XERCES_CPP_NAMESPACE::XercesDOMParser::Val_Never);
 }
 Document::~Document()
 {
@@ -44,12 +44,12 @@ Document::~Document()
 
 }
 // 打开文档
-ErrorCode::ErrorCodeEnum Document::Open(const std::string &path)
+ErrorCode::ErrorCodeEnum Document::openDocument(const std::string &path)
 {
   // 解析 XML 文件
-  parser_.parse(path.c_str());
+  documentParser_.parse(path.c_str());
   // 获取文档
-  document_ = parser_.getDocument();
+  document_ = documentParser_.getDocument();
 
   return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
 }

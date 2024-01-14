@@ -22,3 +22,21 @@
 // Include necessary headers, if any
 
 // Additional comments or code go here
+
+#include <xercesc/util/PlatformUtils.hpp>
+#include "Template.h"
+
+int main()
+{
+  // 初始化 Xerces-C++
+  XERCES_CPP_NAMESPACE::XMLPlatformUtils::Initialize();
+  {
+    qi::Template templatedoc;
+    templatedoc.openTemplateFile("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\document.xml");
+    std::vector<qi::TemplateBlock> templateBlockVector;
+    templatedoc.getTemplateBlockVector(templateBlockVector);
+  }
+  // 释放 Xerces-C++
+  XERCES_CPP_NAMESPACE::XMLPlatformUtils::Terminate();
+  return 0;
+}

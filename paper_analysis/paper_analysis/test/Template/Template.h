@@ -28,6 +28,10 @@
 
 #include <string>
 #include <vector>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMLSParser.hpp>
+
+#include "ErrorCode.h"
 
 namespace qi {
 
@@ -47,14 +51,22 @@ class Template {
 private:
   // 保存模板信息
   std::vector<TemplateBlock> templateBlockVector_;
+  // DOM 解析器
+  XERCES_CPP_NAMESPACE::DOMLSParser* templateParser_;
+  // 模板文档
+  XERCES_CPP_NAMESPACE::DOMDocument* template_;
 
 public:
+  Template();
+  ~Template();
   // get templateblock
-  std::vector<TemplateBlock> getTemplateBlock();
+  ErrorCode::ErrorCodeEnum getTemplateBlockVector(std::vector<TemplateBlock> templateBlockVector);
   // add templateblock
   bool addTemplateBlock(const TemplateBlock& templateBlock);
   // clear templateblock
   bool clearTemplateBlock();
+  // 打开模板文件
+  ErrorCode::ErrorCodeEnum openTemplateFile(const std::string& templateFilePath);
 };
 
 }// namespace qi

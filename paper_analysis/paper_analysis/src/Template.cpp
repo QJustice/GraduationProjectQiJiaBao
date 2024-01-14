@@ -25,10 +25,92 @@
 
 #include "Template.h"
 
+#include <iostream>
+#include <xercesc/dom/DOMAttr.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNamedNodeMap.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+
+#include "CommandParser.h"
+#include "StringExtractor.h"
+#include "XMLParserFactory.h"
+
 namespace qi {
-std::vector<TemplateBlock> qi::Template::getTemplateBlock()
+Template::Template()
 {
-  return templateBlockVector_;
+  // 创建 XMLParserFactory 对象并构建 DOM 解析器
+  XMLParserFactory::createDOMParser("setting01", &templateParser_);
+}
+Template::~Template()
+{
+}
+ErrorCode::ErrorCodeEnum qi::Template::getTemplateBlockVector(std::vector<TemplateBlock> templateBlockVector)
+{
+  // char* 转 XMLCh*
+  XMLCh *tempString = XERCES_CPP_NAMESPACE::XMLString::transcode("w:p");
+  // 获取w:document的w:body的w:p集合
+  XERCES_CPP_NAMESPACE::DOMNodeList *paragraphNodeList = template_->getElementsByTagName(tempString);
+  // 释放内存
+  XERCES_CPP_NAMESPACE::XMLString::release(&tempString);
+  // 创建 StringExtractor 对象用于提取字符串
+  qi::StringExtractor extractor;
+  // CommandParser 对象用于解析字符串中的命令
+  qi::CommandParser commandParser;
+  // 遍历w:p集合
+  for (XMLSize_t i = 0; i < paragraphNodeList->getLength(); ++i)
+  {
+    // 获取w:p
+    XERCES_CPP_NAMESPACE::DOMNode *paragraphNode = paragraphNodeList->item(i);
+    // 检查节点类型是否是元素节点（DOMElement）
+    if (paragraphNode->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE)
+    {
+      // 将 DOMNode 转换为 DOMElement
+      // DOMElement 是 DOMNode 的子类，表示 XML 元素节点
+      // 因为 getElementsByTagName() 返回的是 DOMNodeList，其中的节点类型可能是 DOMElement，也可能是其他类型的节点
+      // A new DOMNodeList object containing all the matched DOMElement(s).(Xerces-C++ API Document for  DOMDocument Class -> getElementsByTagName())
+      // 使用 dynamic_cast 进行向下转型，以确保 paragraphNode 实际上是 DOMElement 类型的节点
+      XERCES_CPP_NAMESPACE::DOMElement *paragraphElement = dynamic_cast<XERCES_CPP_NAMESPACE::DOMElement *>(paragraphNode);
+      // TODO: 比较两个 DOMElement 是否相等
+      if (i==0)
+      {
+        ab = paragraphElement;
+      }
+      if (i==1)
+      {
+        cd = paragraphElement;
+      }
+      if (i==2)
+      {
+        DOMElementComparator::compareDOMElements(ab, cd, result);
+        std::cout << result << std::endl;
+      }
+      // 获取w:p的w14:paraId属性的值
+      // char* 转 XMLCh*
+      XMLCh *tempString = XERCES_CPP_NAMESPACE::XMLString::transcode("w14:paraId");
+      // 获取w:p的w14:paraId属性
+      XERCES_CPP_NAMESPACE::DOMAttr *paragraphAttr = paragraphElement->getAttributeNode(tempString);
+      // 释放内存
+      XERCES_CPP_NAMESPACE::XMLString::release(&tempString);
+      // 获取w:p的w14:paraId属性的值
+      std::string paragraphKey = XERCES_CPP_NAMESPACE::XMLString::transcode(paragraphAttr->getValue());
+      if (paragraphKey == "5B00718F")
+      {
+        std::cout << "5B00718F" << std::endl;
+      }
+      // 打印w:p里面的内容
+      //std::cout << "Original:" <<XERCES_CPP_NAMESPACE::XMLString::transcode(paragraphElement->getTextContent());
+      // 设置为忽略空格和换行符
+      extractor.setClearSpaceAndNewLine(true);
+      std::vector<std::string> result1 = extractor.extractStrings(XERCES_CPP_NAMESPACE::XMLString::transcode(paragraphElement->getTextContent()));
+      for (const auto &str: result1)
+      {
+        std::cout << "Extract:" << commandParser.parseCommand(str);
+        std::cout << std::endl;
+      }
+    }
+  }
+  templateBlockVector_ = templateBlockVector;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 bool Template::addTemplateBlock(const TemplateBlock &templateBlock)
 {
@@ -40,9 +122,10 @@ bool Template::clearTemplateBlock()
   templateBlockVector_.clear();
   return true;
 }
-// 模板分析
-bool Template::AnalysisTemplate(const std::string &path)
+ErrorCode::ErrorCodeEnum Template::openTemplateFile(const std::string &templateFilePath)
 {
-  return false;
+  // 解析 XML 文件并获取文档
+  template_ = templateParser_->parseURI(templateFilePath.c_str());
+  return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 }// namespace qi
