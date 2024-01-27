@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Root>
+	<Abstract>
+		<Title> <!-- 标题 -->
+			<oneLevel> <!-- 一级标题 -->
+				<w:jc w:val="center"/> <!-- 居中 -->
+				<w:rFonts w:val="黑体"/> <!-- 字体:黑体 -->
+				<w:sz w:val="36"/> <!-- 字号:36（小二） -->
+				<w:b/> <!-- 加粗 -->
+			</oneLevel>
+			<twoLevel>
+				<w:jc w:val="center"/> <!-- 居中 -->
+				<w:rFonts w:val="楷体"/> <!-- 字体:楷体 -->
+				<!-- <w:sz w:val="？"/>  字号:？ -->
+				<!-- 文字之间空一格 -->
+			</twoLevel>
+			<threeLevel>
+				<w:jc w:val="center"/> <!-- 居中 -->
+				<w:rFonts w:val="楷体"/> <!-- 字体:楷体 -->
+				<!-- <w:sz w:val="？"/>  字号:？ -->
+				<!-- 文字之间空一格 -->
+			</threeLevel>
+		</Title>
+		<AbstractWord>
+			<w:ind w:firstLine="420"/> <!-- 首行缩进：2字符 -->
+			<w:rFonts w:val="黑体"/> <!-- 字体:黑体 -->
+			<w:sz w:val="21"/> <!-- 字号:21（五号） -->
+			<!-- 空格结尾 -->
+		</AbstractWord>
+		<AbstractText>
+			<w:rFonts w:val="楷体"/> <!-- 字体:楷体 -->
+            <w:sz w:val="21"/> <!-- 字号:21（五号） -->
+		</AbstractText>
+		<keyword>
+			<w:ind w:firstLine="420"/> <!-- 首行缩进：2字符 -->
+			<w:rFonts w:val="黑体"/> <!-- 字体:黑体 -->
+			<w:sz w:val="21"/> <!-- 字号:21（五号） -->
+		</keyword>
+		<keywordText>
+			<w:rFonts w:val="楷体"/> <!-- 字体:楷体 -->
+			<w:sz w:val="21"/> <!-- 字号:21（五号） -->
+			<!-- 各词之间用“；”隔开 -->
+		</keywordText>
+		<TitleEnglish> <!-- 标题 -->
+			<oneLevel> <!-- 一级标题 -->
+				<w:jc w:val="center"/> <!-- 居中 -->
+				<w:rFonts w:val="Times New Roma"/> <!-- 字体:Times New Roma -->
+				<w:sz w:val="32"/> <!-- 字号:32（三号） -->
+				<w:b/> <!-- 加粗 -->
+			</oneLevel>
+			<twoLevel>
+				<w:jc w:val="center"/> <!-- 居中 -->
+				<w:rFonts w:val="Times New Roma"/> <!-- 字体:Times New Roma -->
+				<!-- <w:sz w:val="？"/>  字号:？ -->
+				<!-- 文字之间空一格 -->
+			</twoLevel>
+			<threeLevel>
+
+			</threeLevel>
+		</Title>
+		<AbstractwordEnglish>
+
+		</AbstractwordEnglish>
+		<AbstractTextEnglish>
+
+		</AbstractTextEnglish>
+		<keywordEnglish>
+
+		</keywordEnglish>
+		<keywordTextEnglish>
+
+		</keywordTextEnglish>
+	</Abstract>
+</Root>
