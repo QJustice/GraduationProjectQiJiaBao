@@ -26,15 +26,50 @@
 #ifndef PAPER_ANALYSIS_Paragraph_H
 #define PAPER_ANALYSIS_Paragraph_H
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+
+#include "ErrorCode.h"
+
 namespace qi {
+
+/*
+ * 获取文档的所有<w:p>标签
+ *
+ */
 
 class Paragraph {
 private:
-  // ??? getParagraphProperties();
-public:
-  Paragraph() = default;
-  ~Paragraph() = default;
+  // 文档
+  XERCES_CPP_NAMESPACE::DOMDocument* document_ = nullptr;
+  // <w:p> list
+  XERCES_CPP_NAMESPACE::DOMNodeList* paragraphList_ = nullptr;
+  // 段落索引
+  int paragraphIndex_ = 0;
+  // 段落数量
+  XMLSize_t paragraphCount_ = 0;
 
+public:
+  Paragraph();
+  explicit Paragraph(XERCES_CPP_NAMESPACE::DOMDocument* document);
+  ~Paragraph() = default;
+  // 获取文档的所有<w:p>标签
+  ErrorCode::ErrorCodeEnum paragraphsParser(XERCES_CPP_NAMESPACE::DOMDocument* document);
+  // 获取段落数量
+  ErrorCode::ErrorCodeEnum getParagraphCount(XMLSize_t* count) const;
+  // 获取当前遍历的段落索引
+  ErrorCode::ErrorCodeEnum getParagraphIndex(XMLSize_t* index) const;
+  // 获取当前遍历的段落
+  ErrorCode::ErrorCodeEnum getParagraph(XERCES_CPP_NAMESPACE::DOMNode** paragraph) const;
+  // 获取下一个段落
+  ErrorCode::ErrorCodeEnum nextParagraph();
+  // 获取上一个段落
+  ErrorCode::ErrorCodeEnum previousParagraph();
+  // 重置段落索引
+  ErrorCode::ErrorCodeEnum resetParagraphIndex();
+  // 获取段落的<w:pPr>标签
+  ErrorCode::ErrorCodeEnum getParagraphProperty(XERCES_CPP_NAMESPACE::DOMNode** paragraphProperty) const;
 };
 
 }// namespace qi

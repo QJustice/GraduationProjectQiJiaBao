@@ -26,23 +26,18 @@
 #define PAPER_ANALYSIS_DOCUMENT_H
 
 #include <string>
-#include <vector>
+
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMLSParser.hpp>
 
 #include "ErrorCode.h"
 #include "Paragraph.h"
+#include "Run.h"
+//#include "Section.h
+#include "Style.h"
 #include "Template.h"
 
 namespace qi {
-
-// 段落块信息
-struct ParagraphBlock {
-  // 段落标记字
-  std::string ParagraphKey = "null";
-  // 段落块集合
-  std::vector<Paragraph> ParagraphsVector;
-};
 
 class Document {
 private:
@@ -50,25 +45,27 @@ private:
   XERCES_CPP_NAMESPACE::DOMLSParser* documentParser_;
   // 文档
   XERCES_CPP_NAMESPACE::DOMDocument* document_;
-
+  // 文档路径
+  std::string documentPath_;
+  // 文档名称
+  std::string documentName_;
+  // <w:p> 段落
+  Paragraph paragraphs_;
+  // <w:r> 运行块
+  Run runs_;
+  // <w:sectPr> 节属性
+  // Section section_;
+  // <w:style> 样式
+  Style styles_;
   // 模板信息
   Template documentTemplate_;
-  // 段落块集合
-  std::vector<ParagraphBlock> paragraphBlockVector_;
 
 public:
   Document();
   ~Document();
   // open document
   ErrorCode::ErrorCodeEnum openDocument(const std::string& path);
-  // get paragraphvector
-  ErrorCode::ErrorCodeEnum getParagraphVetor(std::vector<ParagraphBlock>& paragraphBlockVector);
-  // get section
-  // Section getSection();
-  // get table
-  // Table getTable();
-  // get document information
-  // ??? getDocumentInfo();
+
 };
 
 }// namespace qi

@@ -40,6 +40,8 @@ include_directories(${GTEST_INCLUDE_DIRS})
 set(SOURCE
         include/Document.h
         include/Paragraph.h
+        include/Run.h
+        include/Style.h
         include/Template.h
         include/ErrorCode.h
         include/StringExtractor.h
@@ -49,6 +51,8 @@ set(SOURCE
         src/main.cpp
         src/Document.cpp
         src/Paragraph.cpp
+        src/Run.cpp
+        src/Style.cpp
         src/Template.cpp
         src/ErrorCode.cpp
         src/StringExtractor.cpp

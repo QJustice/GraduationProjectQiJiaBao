@@ -25,6 +25,8 @@
 
 #include "Document.h"
 
+#include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <xercesc/dom/DOMAttr.hpp>
 #include <xercesc/dom/DOMDocument.hpp>
@@ -32,11 +34,15 @@
 #include <xercesc/dom/DOMImplementationLS.hpp>
 #include <xercesc/dom/DOMImplementationRegistry.hpp>
 #include <xercesc/dom/DOMNamedNodeMap.hpp>
+#include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
 
 #include "CommandParser.h"
+#include "Paragraph.h"
+#include "Run.h"
 #include "StringExtractor.h"
 #include "XMLParserFactory.h"
+
 
 namespace qi {
 Document::Document()
@@ -52,65 +58,52 @@ Document::~Document()
 // 打开文档
 ErrorCode::ErrorCodeEnum Document::openDocument(const std::string &documentFilePath)
 {
+  // 保存文档路径
+  documentPath_ = documentFilePath;
+  // 保存文档名称
+  documentName_ = documentFilePath.substr(documentFilePath.find_last_of('/') + 1);
+  // 检查文档路径是否为空
+  if (documentFilePath.empty())
+  {
+    std::cerr << "Document path is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
   // 解析 XML 文件并获取文档
   document_ = documentParser_->parseURI(documentFilePath.c_str());
+  // 检查文档是否为空
+  if (document_ == nullptr)
+  {
+    std::cerr << "Document is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 获取文档的所有<w:p>标签
+  paragraphs_.paragraphsParser(document_);
+
+  // 打印出所有段落中的文本
+  XMLSize_t paragraphCount = 0;
+  paragraphs_.getParagraphCount(&paragraphCount);
+  for (XMLSize_t i = 0; i < paragraphCount; ++i)
+  {
+    Run runs(&paragraphs_);
+    XMLSize_t runCount = 0;
+    runs.getRunCount(&runCount);
+    for (XMLSize_t j = 0; j < runCount; ++j)
+    {
+      XERCES_CPP_NAMESPACE::DOMNode *run = nullptr;
+      runs.getRun(&run);
+      std::string text;
+      runs.getRunText(&text);
+      // 使用标准库的算法和迭代器去除空白字符
+      text.erase(
+              std::remove_if(text.begin(), text.end(), ::isspace),
+              text.end());
+      std::cout << text << std::endl;
+      runs.getNextRun(&run);
+    }
+    paragraphs_.nextParagraph();
+  }
 
   return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-// 获取段落块集合
-ErrorCode::ErrorCodeEnum Document::getParagraphVetor(std::vector<ParagraphBlock> &paragraphBlockVector)
-{
-  // char* 转 XMLCh*
-  XMLCh *tempString = XERCES_CPP_NAMESPACE::XMLString::transcode("w:p");
-  // 获取w:document的w:body的w:p集合
-  XERCES_CPP_NAMESPACE::DOMNodeList *paragraphNodeList = document_->getElementsByTagName(tempString);
-  // 释放内存
-  XERCES_CPP_NAMESPACE::XMLString::release(&tempString);
-  // 创建 StringExtractor 对象用于提取字符串
-  qi::StringExtractor extractor;
-  // CommandParser 对象用于解析字符串中的命令
-  qi::CommandParser commandParser;
-  // 遍历w:p集合
-  for (XMLSize_t i = 0; i < paragraphNodeList->getLength(); ++i)
-  {
-    // 获取w:p
-    XERCES_CPP_NAMESPACE::DOMNode *paragraphNode = paragraphNodeList->item(i);
-    // 检查节点类型是否是元素节点（DOMElement）
-    if (paragraphNode->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE)
-    {
-      // 将 DOMNode 转换为 DOMElement
-      // DOMElement 是 DOMNode 的子类，表示 XML 元素节点
-      // 因为 getElementsByTagName() 返回的是 DOMNodeList，其中的节点类型可能是 DOMElement，也可能是其他类型的节点
-      // A new DOMNodeList object containing all the matched DOMElement(s).(Xerces-C++ API Document for  DOMDocument Class -> getElementsByTagName())
-      // 使用 dynamic_cast 进行向下转型，以确保 paragraphNode 实际上是 DOMElement 类型的节点
-      XERCES_CPP_NAMESPACE::DOMElement *paragraphElement = dynamic_cast<XERCES_CPP_NAMESPACE::DOMElement *>(paragraphNode);
 
-      // 获取w:p的w14:paraId属性的值
-      // char* 转 XMLCh*
-      XMLCh *tempString = XERCES_CPP_NAMESPACE::XMLString::transcode("w14:paraId");
-      // 获取w:p的w14:paraId属性
-      XERCES_CPP_NAMESPACE::DOMAttr *paragraphAttr = paragraphElement->getAttributeNode(tempString);
-      // 释放内存
-      XERCES_CPP_NAMESPACE::XMLString::release(&tempString);
-      // 获取w:p的w14:paraId属性的值
-      std::string paragraphKey = XERCES_CPP_NAMESPACE::XMLString::transcode(paragraphAttr->getValue());
-      if (paragraphKey == "5B00718F")
-      {
-        std::cout << "5B00718F" << std::endl;
-      }
-      // 打印w:p里面的内容
-      //std::cout << "Original:" <<XERCES_CPP_NAMESPACE::XMLString::transcode(paragraphElement->getTextContent());
-      // 设置为忽略空格和换行符
-      extractor.setClearSpaceAndNewLine(true);
-      std::vector<std::string> result1 = extractor.extractStrings(XERCES_CPP_NAMESPACE::XMLString::transcode(paragraphElement->getTextContent()));
-      for (const auto &str: result1)
-      {
-        std::cout << "Extract:" << commandParser.parseCommand(str);
-        std::cout << std::endl;
-      }
-    }
-  }
-  paragraphBlockVector_ = paragraphBlockVector;
-  return ErrorCode::ErrorCodeEnum::SUCCESS;
-}
 }// namespace qi

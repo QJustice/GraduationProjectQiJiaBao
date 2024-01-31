@@ -25,5 +25,107 @@
 
 #include "Paragraph.h"
 
+#include <iostream>
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/util/XMLString.hpp>
+
 namespace qi {
+
+Paragraph::Paragraph()
+{
+}
+Paragraph::Paragraph(XERCES_CPP_NAMESPACE::DOMDocument* document)
+{
+  // 获取文档的所有<w:p>标签
+  paragraphsParser(document);
+}
+
+ErrorCode::ErrorCodeEnum Paragraph::paragraphsParser(XERCES_CPP_NAMESPACE::DOMDocument* document)
+{
+  // 检查文档是否为空
+  if (document == nullptr)
+  {
+    std::cerr << "文档为空" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 保存文档
+  document_ = document;
+  // 调用 transcode 函数将 string 转换为 XMLCh
+  XMLCh* xmlString = XERCES_CPP_NAMESPACE::XMLString::transcode("w:p");
+  // 获取文档的所有<w:p>标签
+  paragraphList_ = document->getElementsByTagName(xmlString);
+  // 释放内存
+  XERCES_CPP_NAMESPACE::XMLString::release(&xmlString);
+  // 获取段落数量
+  paragraphCount_ = paragraphList_->getLength();
+  // 重置段落索引
+  resetParagraphIndex();
+
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Paragraph::getParagraphCount(XMLSize_t* count) const
+{
+  // 获取段落数量
+  *count = paragraphCount_;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Paragraph::getParagraphIndex(XMLSize_t* index) const
+{
+  // 获取当前遍历的段落索引
+  *index = paragraphIndex_;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Paragraph::getParagraph(xercesc_3_2::DOMNode** paragraph) const
+{
+  // 获取当前遍历的段落
+  *paragraph = paragraphList_->item(paragraphIndex_);
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Paragraph::nextParagraph()
+{
+  // 检查段落索引是否超出范围
+  if (paragraphIndex_ >= paragraphCount_)
+  {
+    std::cerr << "段落索引超出范围" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 段落索引加一
+  ++paragraphIndex_;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Paragraph::previousParagraph()
+{
+  // 检查段落索引是否超出范围
+  if (paragraphIndex_ <= 0)
+  {
+    std::cerr << "段落索引超出范围" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 段落索引减一
+  --paragraphIndex_;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Paragraph::resetParagraphIndex()
+{
+  // 重置段落索引
+  paragraphIndex_ = 0;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Paragraph::getParagraphProperty(xercesc_3_2::DOMNode** paragraphProperty) const
+{
+  // 临时保存段落
+  XERCES_CPP_NAMESPACE::DOMNode* paragraph = nullptr;
+  // 获取当前遍历的段落
+  getParagraph(&paragraph);
+  if (paragraph == nullptr)
+  {
+    std::cerr << "段落为空" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 获取段落的<w:pPr>标签, 该标签包含段落的属性,<w:pPr>标签是<w:p>标签的第一个子标签
+  *paragraphProperty = paragraph->getFirstChild();
+
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+
 }// namespace qi

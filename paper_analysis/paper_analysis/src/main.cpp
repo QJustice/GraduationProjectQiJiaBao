@@ -32,17 +32,13 @@ int main()
 {
   // 初始化 Xerces-C++
   XERCES_CPP_NAMESPACE::XMLPlatformUtils::Initialize();
-//  {
-//    qi::Document document;
-//    document.openDocument("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\document.xml");
-//    std::vector<qi::ParagraphBlock> paragraphBlockVector;
-//    document.getParagraphVetor(paragraphBlockVector);
-//  }
+  {
+    qi::Document document;
+    document.openDocument("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\document.xml");
+  }
   {
     qi::Template templatedoc;
     templatedoc.openTemplateFile("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\document.xml");
-    std::vector<qi::TemplateBlock> templateBlockVector;
-    templatedoc.getTemplateBlockVector(templateBlockVector);
   }
 
   // 释放 Xerces-C++
