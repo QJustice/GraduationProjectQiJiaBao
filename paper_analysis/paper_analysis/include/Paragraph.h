@@ -26,11 +26,13 @@
 #ifndef PAPER_ANALYSIS_Paragraph_H
 #define PAPER_ANALYSIS_Paragraph_H
 
+#include <string>
 #include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
 #include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 
 #include "ErrorCode.h"
+#include "TransString.h"
 
 namespace qi {
 
@@ -38,6 +40,8 @@ namespace qi {
  * 获取文档的所有<w:p>标签
  *
  */
+
+
 
 class Paragraph {
 private:
@@ -49,6 +53,8 @@ private:
   int paragraphIndex_ = 0;
   // 段落数量
   XMLSize_t paragraphCount_ = 0;
+  // 字符串转换工具
+  TransString transString_;
 
 public:
   Paragraph();
@@ -68,6 +74,8 @@ public:
   ErrorCode::ErrorCodeEnum previousParagraph();
   // 重置段落索引
   ErrorCode::ErrorCodeEnum resetParagraphIndex();
+  // 获取段落的文本
+  ErrorCode::ErrorCodeEnum getParagraphText(std::string& text);
   // 获取段落的<w:pPr>标签
   ErrorCode::ErrorCodeEnum getParagraphProperty(XERCES_CPP_NAMESPACE::DOMNode** paragraphProperty) const;
 };

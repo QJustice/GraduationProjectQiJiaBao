@@ -32,6 +32,7 @@
 
 #include "ErrorCode.h"
 #include "Paragraph.h"
+#include "TransString.h"
 #include "Run.h"
 //#include "Section.h
 #include "Style.h"
@@ -57,15 +58,21 @@ private:
   // Section section_;
   // <w:style> 样式
   Style styles_;
+  // 字符串转换
+  TransString transString_;
   // 模板信息
   Template documentTemplate_;
 
 public:
   Document();
+  Document(const std::string &documentFilePath, const std::string &templateFilePath);
   ~Document();
   // open document
-  ErrorCode::ErrorCodeEnum openDocument(const std::string& path);
-
+  ErrorCode::ErrorCodeEnum loadDocument(const std::string& documentFilePath, const std::string &templateFilePath);
+  // set Template
+  ErrorCode::ErrorCodeEnum setTemplate(const std::string& templateFilePath);
+  // 检测
+  ErrorCode::ErrorCodeEnum checkDocument();
 };
 
 }// namespace qi

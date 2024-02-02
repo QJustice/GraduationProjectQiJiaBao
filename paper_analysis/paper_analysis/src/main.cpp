@@ -24,26 +24,51 @@
 // Additional comments or code go here
 
 #include <iostream>
-
 #include <xercesc/util/PlatformUtils.hpp>
+
 #include "Document.h"
+#include "Template.h"
 
 int main()
 {
   // 初始化 Xerces-C++
   XERCES_CPP_NAMESPACE::XMLPlatformUtils::Initialize();
+
+#if 1
   {
     qi::Document document;
-    document.openDocument("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\document.xml");
+    document.loadDocument("D:\\WorkSpace\\VSCodeFile\\word\\Template01\\word\\document.xml", "D:\\WorkSpace\\GraduationProject\\GraduationProjectQiJiaBao\\paper_analysis\\paper_analysis\\data\\Template\\Undergraduate\\test01.xml");
+    document.checkDocument();
+
   }
+#endif
+#if 0
   {
     qi::Template templatedoc;
-    templatedoc.openTemplateFile("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\document.xml");
+    //templatedoc.openTemplateFile("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\document.xml");
   }
-
+#endif
+#if 0
+  {
+    qi::Style style;
+    style.loadStyle("D:\\WorkSpace\\VSCodeFile\\word\\Template02\\word\\style01.xml");
+    XERCES_CPP_NAMESPACE::DOMElement* defaultStyleElement = nullptr;
+    style.defaultStyle(&defaultStyleElement);
+    // 打印默认样式
+    std::cout << "defaultStyleElement: " << XERCES_CPP_NAMESPACE::XMLString::transcode(defaultStyleElement->getTagName()) << std::endl;
+    XERCES_CPP_NAMESPACE::DOMElement* styleElement = nullptr;
+    style.findStyleByStyleId("2", &styleElement);
+    // 打印样式
+    std::cout << "styleElement: " << XERCES_CPP_NAMESPACE::XMLString::transcode(styleElement->getTagName()) << std::endl;
+  }
+#endif
+#if 0
+  {
+    qi::Template templatedoc;
+    templatedoc.openTemplateFile("D:\\WorkSpace\\GraduationProject\\GraduationProjectQiJiaBao\\paper_analysis\\paper_analysis\\data\\Template\\Undergraduate\\test01.xml");
+  }
+#endif
   // 释放 Xerces-C++
   XERCES_CPP_NAMESPACE::XMLPlatformUtils::Terminate();
   return 0;
 }
-
-

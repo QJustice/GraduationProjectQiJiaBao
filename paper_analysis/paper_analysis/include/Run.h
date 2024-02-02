@@ -29,6 +29,7 @@
 
 #include "ErrorCode.h"
 #include "Paragraph.h"
+#include "TransString.h"
 
 namespace qi {
 
@@ -42,6 +43,8 @@ private:
   int runIndex_ = 0;
   // 运行块数量
   XMLSize_t runCount_ = 0;
+  // 字符串转换工具
+  TransString transString_;
 public:
   Run();
   explicit Run(Paragraph* paragraph);
@@ -61,7 +64,7 @@ public:
   // 重置运行块索引
   ErrorCode::ErrorCodeEnum resetRunIndex();
   // 获取运行块文本
-  ErrorCode::ErrorCodeEnum getRunText(std::string* text) const;
+  ErrorCode::ErrorCodeEnum getRunText(std::string* text);
   // 获取运行块<w:rPr>标签
   ErrorCode::ErrorCodeEnum getRunProperties(XERCES_CPP_NAMESPACE::DOMNode** runProperties) const;
 };

@@ -1,0 +1,57 @@
+<!--<Template>-->
+<!--    <div id="0">-->
+<!--        <name>AAA</name>-->
+<!--    </div>-->
+<!--    <div id="1">-->
+<!--        <name>BBB</name>-->
+<!--    </div>-->
+<!--    <div id="2">-->
+<!--        <name>CCC</name>-->
+<!--    </div>-->
+<!--</Template>-->
+
+
+
+
+<Template>
+    <div id="0">
+        <name>本科毕业论文（设计）</name>
+    </div>
+    <div id="1">
+        <name>毕业论文原创性声明</name>
+    </div>
+    <div id="2">
+        <name>目录</name>
+    </div>
+    <div id="3">
+        <name>摘要</name>
+    </div>
+    <div id="4">
+        <name>关键字</name>
+    </div>
+    <div id="5">
+        <name>Abstract</name>
+    </div>
+    <div id="6">
+        <name>Keywords</name>
+    </div>
+    <div id="7">
+        <name>致谢</name>
+    </div>
+    <div id="8">
+        <name>参考文献</name>
+    </div>
+</Template>
+
+
+<!--          {"本科毕业论文（设计", 0},
+                  {"毕业论文原创性声明", 1},
+                  {"目录", 2},
+                  {"摘要", 3},
+                  {"关键字", 4},
+                  {"Abstract", 5},
+                  {"Keywords", 6},
+                  {"致谢", 7},
+                  {"参考文献", 8}}; -->
+
+<!-- Path: paper_analysis/data/Template/Undergraduate/test03.xml -->

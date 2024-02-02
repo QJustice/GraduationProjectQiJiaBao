@@ -27,12 +27,13 @@
 #define PAPER_ANALYSIS_TEMPLATE_H
 
 #include <string>
-#include <vector>
+#include <map>
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMLSParser.hpp>
 
 #include "ErrorCode.h"
 #include "DOMElementComparator.h"
+#include "TransString.h"
 
 namespace qi {
 
@@ -43,17 +44,29 @@ private:
   XERCES_CPP_NAMESPACE::DOMLSParser* templateParser_;
   // 模板文档
   XERCES_CPP_NAMESPACE::DOMDocument* template_;
+  // 模板文件路径
+  std::string templateFilePath_;
+  // 模板名称
+  std::string templateName_;
+  // 关键字数量
+  XMLSize_t keywordCount_;
+  // 字符串转换工具
+  TransString transString_;
+  // 模板关键字, 关键字索引
+  std::map<const std::string , XMLSize_t> keywords_;
 
-  XERCES_CPP_NAMESPACE::DOMElement* ab;
-  XERCES_CPP_NAMESPACE::DOMElement* cd;
-  bool result;
 
 public:
   Template();
+  Template(const std::string& templateFilePath);
   ~Template();
 
   // 打开模板文件
   ErrorCode::ErrorCodeEnum openTemplateFile(const std::string& templateFilePath);
+  // 解析模板文件
+  ErrorCode::ErrorCodeEnum parseTemplateFile();
+  // Find the keyword in the template
+  ErrorCode::ErrorCodeEnum findKeyword(const std::string keyword, XMLSize_t** index);
 };
 
 }// namespace qi

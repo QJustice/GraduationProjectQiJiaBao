@@ -29,6 +29,8 @@
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMNode.hpp>
 
+#include "NodeToElement.h"
+
 namespace qi {
 Run::Run()
 {
@@ -57,18 +59,18 @@ ErrorCode::ErrorCodeEnum Run::runsParser(Paragraph* paragraph)
     std::cerr << "段落为空" << std::endl;
     return ErrorCode::ErrorCodeEnum::FAILED;
   }
-  if (tempParagraph->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE)
+  // 将 tempParagraph 转换为 DOMElement
+  XERCES_CPP_NAMESPACE::DOMElement* convertedElement = nullptr;
+  // NodeToElement 对象是用来将 DOMNode 转换为 DOMElement的工具类
+  NodeToElement nodeToElement;
+  if (ErrorCode::ErrorCodeEnum::SUCCESS == nodeToElement.nodeToElement(tempParagraph, &convertedElement))
   {
-    // 将 tempParagraph 转换为 DOMElement
-    // 在Xerces-C++中，DOMElement是DOM节点的一种，它表示XML文档中的元素, DOMElement继承自DOMNode
-    // 有些DOM节点是DOMElement，但不是所有的DOM节点都是DOMElement，所以先要判断节点类型再转换避免出错
-    XERCES_CPP_NAMESPACE::DOMElement* convertedElement = dynamic_cast<XERCES_CPP_NAMESPACE::DOMElement*>(tempParagraph);
     // 调用 transcode 函数将 string 转换为 XMLCh
-    XMLCh* xmlString = XERCES_CPP_NAMESPACE::XMLString::transcode("w:r");
+    XMLCh* xmlString = nullptr;
+    transString_.charToXMLCh("w:r", &xmlString);
     // 获取段落的所有<w:r>标签
     runList_ = convertedElement->getElementsByTagName(xmlString);
-    // 释放内存
-    XERCES_CPP_NAMESPACE::XMLString::release(&xmlString);
+
   } else
   {
     std::cerr << "段落类型错误" << std::endl;
@@ -128,7 +130,7 @@ ErrorCode::ErrorCodeEnum Run::resetRunIndex()
   runIndex_ = 0;
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-ErrorCode::ErrorCodeEnum Run::getRunText(std::string* text) const
+ErrorCode::ErrorCodeEnum Run::getRunText(std::string* text)
 {
   // 临时保存运行块
   XERCES_CPP_NAMESPACE::DOMNode* tempRun = nullptr;
@@ -142,11 +144,11 @@ ErrorCode::ErrorCodeEnum Run::getRunText(std::string* text) const
   }
   // 获取运行块的Text
   // 将 XMLCh* 转换为 char*
-  char* charString = XERCES_CPP_NAMESPACE::XMLString::transcode(tempRun->getTextContent());
+  char* charString = nullptr;
+  transString_.xmlCharToChar(tempRun->getTextContent(), &charString);
   // 保存运行块的Text
   *text = charString;
-  // 释放内存
-  XERCES_CPP_NAMESPACE::XMLString::release(&charString);
+
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 ErrorCode::ErrorCodeEnum Run::getRunProperties(xercesc_3_2::DOMNode** runProperties) const

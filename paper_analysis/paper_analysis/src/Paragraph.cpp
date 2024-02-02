@@ -50,12 +50,12 @@ ErrorCode::ErrorCodeEnum Paragraph::paragraphsParser(XERCES_CPP_NAMESPACE::DOMDo
   }
   // 保存文档
   document_ = document;
-  // 调用 transcode 函数将 string 转换为 XMLCh
-  XMLCh* xmlString = XERCES_CPP_NAMESPACE::XMLString::transcode("w:p");
+  XMLCh* xmlString = nullptr;
+  // 调用 charToXMLCh 函数将 char* 转换为 XMLCh*
+  transString_.charToXMLCh("w:p", &xmlString);
   // 获取文档的所有<w:p>标签
   paragraphList_ = document->getElementsByTagName(xmlString);
-  // 释放内存
-  XERCES_CPP_NAMESPACE::XMLString::release(&xmlString);
+
   // 获取段落数量
   paragraphCount_ = paragraphList_->getLength();
   // 重置段落索引
@@ -126,6 +126,26 @@ ErrorCode::ErrorCodeEnum Paragraph::getParagraphProperty(xercesc_3_2::DOMNode** 
   *paragraphProperty = paragraph->getFirstChild();
 
   return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Paragraph::getParagraphText(std::string& text)
+{
+  // 临时保存段落
+  XERCES_CPP_NAMESPACE::DOMNode* paragraph = nullptr;
+  // 获取当前遍历的段落
+  getParagraph(&paragraph);
+  if (paragraph == nullptr)
+  {
+    std::cerr << "段落为空" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 获取段落的文本
+  // 将 XMLCh* 转换为 char*
+  char* charString = nullptr;
+  transString_.xmlCharToChar(paragraph->getTextContent(), &charString);
+  // 保存段落的文本
+  text = charString;
+
+  return ErrorCode::ErrorCodeEnum::UNKNOWN_ERROR;
 }
 
 }// namespace qi

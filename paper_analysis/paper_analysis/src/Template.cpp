@@ -32,22 +32,137 @@
 #include <xercesc/dom/DOMNodeList.hpp>
 
 #include "CommandParser.h"
+#include "EraseSpaces.h"
 #include "StringExtractor.h"
 #include "XMLParserFactory.h"
 
 namespace qi {
 Template::Template()
 {
+  // 初始化模板关键字
+//  keywords_ =
+//          {
+//                  {"本科毕业论文（设计", 0},
+//                  {"毕业论文原创性声明", 1},
+//                  {"目录", 2},
+//                  {"摘要", 3},
+//                  {"关键字", 4},
+//                  {"Abstract", 5},
+//                  {"Keywords", 6},
+//                  {"致谢", 7},
+//                  {"参考文献", 8}};
+
   // 创建 XMLParserFactory 对象并构建 DOM 解析器
   XMLParserFactory::createDOMParser("setting01", &templateParser_);
+}
+Template::Template(const std::string &templateFilePath)
+{
+  // 创建 XMLParserFactory 对象并构建 DOM 解析器
+  XMLParserFactory::createDOMParser("setting01", &templateParser_);
+  // 打开模板
+  openTemplateFile(templateFilePath);
 }
 Template::~Template()
 {
 }
 ErrorCode::ErrorCodeEnum Template::openTemplateFile(const std::string &templateFilePath)
 {
+  // 检查模板路径是否为空
+  if (templateFilePath.empty())
+  {
+    std::cerr << "Template path is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 保存模板路径
+  templateFilePath_ = templateFilePath;
+  // 保存模板名称
+  templateName_ = templateFilePath.substr(templateFilePath.find_last_of('/') + 1);
   // 解析 XML 文件并获取文档
   template_ = templateParser_->parseURI(templateFilePath.c_str());
+  // 检查模板是否为空
+  if (template_ == nullptr)
+  {
+    std::cerr << "Template is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  parseTemplateFile();
+  return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Template::parseTemplateFile()
+{
+  // 检查模板是否为空
+  if (template_ == nullptr)
+  {
+    std::cerr << "Template is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 获取模板的根节点
+  XERCES_CPP_NAMESPACE::DOMElement *root = template_->getDocumentElement();
+  // 获取模板的所有<div>标签
+  XERCES_CPP_NAMESPACE::DOMNodeList *divList = root->getElementsByTagName(XERCES_CPP_NAMESPACE::XMLString::transcode("div"));
+  // 获取<div>标签数量
+  keywordCount_ = divList->getLength();
+  // 保存div
+  XERCES_CPP_NAMESPACE::DOMNode *div = nullptr;
+  // 保存转换后的字符串
+  char* text1 = nullptr;
+  // 保存处理后的字符串
+  std::string text2="";
+  // 清除所有空格
+  EraseSpaces eraseSpaces;
+  // 遍历<div>标签
+  for (XMLSize_t i = 0; i < keywordCount_; i++)
+  {
+    // 获取<div>标签
+    div = divList->item(i);
+    transString_.xmlCharToChar(div->getTextContent(), &text1);
+    text2 = text1;
+    // 清除空格
+    eraseSpaces.eraseSpaces(text2);
+    // 清除换行
+    eraseSpaces.eraseNewLine(text2);
+    keywords_.insert(std::make_pair(text2, i));
+  }
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Template::findKeyword(const std::string keyword, XMLSize_t **index)
+{
+  // 检查关键字是否为空
+  if (keyword.empty())
+  {
+    //std::cerr << "Keyword is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  auto iter = keywords_.find(keyword);
+  if (iter == keywords_.end())
+  {
+    *index = nullptr;
+    //std::cerr << "Keyword not found!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  *index = &iter->second;
   return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 }// namespace qi
+
+
+// 初始化模板关键字
+//  keywords_ =
+//  {
+//    {1, "本科毕业论文（设计）"},
+//    {2, "中文论文题目"},
+//    {3, "EengligTitle"},
+//    {4, "2024年1月7日"},
+//    {5, "毕业论文原创性声明"},
+//    {6, "目录"},
+//    {7, "全文共xx页xxxx字"},
+//    {8, "基于Python的高校教务管理系统的设计与实现"},
+//    {9, "摘要"},
+//    {10, "关键词"},
+//    {11, "AnOrganixedTacticsofLargeDatabaseSystemforReal-timeCollectionandQuery"},
+//    {12, "Abstract"},
+//    {13, "Keywords"},
+//    {14, "$main"},
+//    {15, "致谢"},
+//    {16, "参考文献"}
+//  };

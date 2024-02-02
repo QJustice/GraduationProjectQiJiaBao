@@ -38,11 +38,11 @@
 #include <xercesc/dom/DOMNodeList.hpp>
 
 #include "CommandParser.h"
+#include "EraseSpaces.h"
 #include "Paragraph.h"
 #include "Run.h"
 #include "StringExtractor.h"
 #include "XMLParserFactory.h"
-
 
 namespace qi {
 Document::Document()
@@ -50,24 +50,39 @@ Document::Document()
   // 创建 XMLParserFactory 对象并构建 DOM 解析器
   XMLParserFactory::createDOMParser("setting01", &documentParser_);
 }
+Document::Document(const std::string &documentFilePath, const std::string &templateFilePath)
+{
+  // 创建 XMLParserFactory 对象并构建 DOM 解析器
+  XMLParserFactory::createDOMParser("setting01", &documentParser_);
+  // 打开文档，确保templateFilePath不为空
+  loadDocument(documentFilePath, templateFilePath);
+}
 Document::~Document()
 {
   // 释放解析器
   documentParser_->release();
 }
 // 打开文档
-ErrorCode::ErrorCodeEnum Document::openDocument(const std::string &documentFilePath)
+ErrorCode::ErrorCodeEnum Document::loadDocument(const std::string &documentFilePath, const std::string &templateFilePath)
 {
-  // 保存文档路径
-  documentPath_ = documentFilePath;
-  // 保存文档名称
-  documentName_ = documentFilePath.substr(documentFilePath.find_last_of('/') + 1);
+  // 检测模板路径是否为空
+  if (templateFilePath.empty())
+  {
+    std::cerr << "Template path is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 设置模板
+  setTemplate(templateFilePath);
   // 检查文档路径是否为空
   if (documentFilePath.empty())
   {
     std::cerr << "Document path is empty!" << std::endl;
     return qi::ErrorCode::ErrorCodeEnum::FAILED;
   }
+  // 保存文档路径
+  documentPath_ = documentFilePath;
+  // 保存文档名称
+  documentName_ = documentFilePath.substr(documentFilePath.find_last_of('/') + 1);
   // 解析 XML 文件并获取文档
   document_ = documentParser_->parseURI(documentFilePath.c_str());
   // 检查文档是否为空
@@ -79,11 +94,43 @@ ErrorCode::ErrorCodeEnum Document::openDocument(const std::string &documentFileP
   // 获取文档的所有<w:p>标签
   paragraphs_.paragraphsParser(document_);
 
+  return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Document::setTemplate(const std::string &templateFilePath)
+{
+  // 检查模板路径是否为空
+  if (templateFilePath.empty())
+  {
+    std::cerr << "Template path is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 打开模板
+  documentTemplate_.openTemplateFile(templateFilePath);
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Document::checkDocument()
+{
+  // 清除所有空格
+  EraseSpaces eraseSpaces;
   // 打印出所有段落中的文本
   XMLSize_t paragraphCount = 0;
   paragraphs_.getParagraphCount(&paragraphCount);
   for (XMLSize_t i = 0; i < paragraphCount; ++i)
   {
+    // 获取段落文本
+    std::string text;
+    paragraphs_.getParagraphText(text);
+    // 清除空格
+    eraseSpaces.eraseSpaces(text);
+    // 清除换行符
+    eraseSpaces.eraseNewLine(text);
+    if (text.empty())
+    {
+      paragraphs_.nextParagraph();
+      continue;
+    }
+    //std::cout << "Paragraph: " << text << std::endl;
+
     Run runs(&paragraphs_);
     XMLSize_t runCount = 0;
     runs.getRunCount(&runCount);
@@ -94,16 +141,22 @@ ErrorCode::ErrorCodeEnum Document::openDocument(const std::string &documentFileP
       std::string text;
       runs.getRunText(&text);
       // 使用标准库的算法和迭代器去除空白字符
-      text.erase(
-              std::remove_if(text.begin(), text.end(), ::isspace),
-              text.end());
-      std::cout << text << std::endl;
+      eraseSpaces.eraseSpaces(text);
+      // 清除换行符
+      eraseSpaces.eraseNewLine(text);
+      //std::cout << text << std::endl;
+      XMLSize_t *index = nullptr;
+      documentTemplate_.findKeyword(text, &index);
+      if (index != nullptr)
+      {
+        std::cout << "Keyword: " << text << " Index: " << *index << std::endl;
+      }
       runs.getNextRun(&run);
     }
     paragraphs_.nextParagraph();
   }
-
-  return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
+
 
 }// namespace qi

@@ -48,6 +48,9 @@ set(SOURCE
         include/CommandParser.h
         include/XMLParserFactory.h
         include/DOMElementComparator.h
+        include/NodeToElement.h
+        include/EraseSpaces.h
+        include/TransString.h
         src/main.cpp
         src/Document.cpp
         src/Paragraph.cpp
@@ -59,6 +62,9 @@ set(SOURCE
         src/CommandParser.cpp
         tools/XMLParserFactory.cpp
         tools/DOMElementComparator.cpp
+        tools/NodeToElement.cpp
+        tools/EraseSpaces.cpp
+        tools/TransString.cpp
 )
 
 # 将源代码添加到此项目的可执行文件。
