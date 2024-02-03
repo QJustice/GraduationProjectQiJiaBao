@@ -25,23 +25,33 @@
 #include "Run.h"
 
 #include <iostream>
-#include <xercesc/util/XMLString.hpp>
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/util/XMLString.hpp>
 
+#include "FindElements.h"
 #include "NodeToElement.h"
 
 namespace qi {
 Run::Run()
 {
 }
-Run::Run(Paragraph* paragraph)
+Run::Run(Paragraph* paragraph, XERCES_CPP_NAMESPACE::DOMDocument* doc)
 {
   // 获取段落的所有<w:r>标签
-  runsParser(paragraph);
+  runsParser(paragraph, doc);
+  // 保存文档
+  doc_ = doc;
 }
-ErrorCode::ErrorCodeEnum Run::runsParser(Paragraph* paragraph)
+ErrorCode::ErrorCodeEnum Run::runsParser(Paragraph* paragraph, XERCES_CPP_NAMESPACE::DOMDocument* doc)
 {
+  if (doc == nullptr)
+  {
+    std::cerr << "文档为空" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 保存文档
+  doc_ = doc;
   // 检查段落是否为空
   if (paragraph == nullptr)
   {
@@ -63,13 +73,13 @@ ErrorCode::ErrorCodeEnum Run::runsParser(Paragraph* paragraph)
   XERCES_CPP_NAMESPACE::DOMElement* convertedElement = nullptr;
   // NodeToElement 对象是用来将 DOMNode 转换为 DOMElement的工具类
   NodeToElement nodeToElement;
+  // FindElements 对象是用来查找 XML 元素的工具类
+  FindElements findElements;
   if (ErrorCode::ErrorCodeEnum::SUCCESS == nodeToElement.nodeToElement(tempParagraph, &convertedElement))
   {
-    // 调用 transcode 函数将 string 转换为 XMLCh
-    XMLCh* xmlString = nullptr;
-    transString_.charToXMLCh("w:r", &xmlString);
     // 获取段落的所有<w:r>标签
-    runList_ = convertedElement->getElementsByTagName(xmlString);
+    // runList_ = convertedElement->getElementsByTagName(xmlString);
+    findElements.FindElementByXPath(doc_, convertedElement, "./r", &runListXPath_);
 
   } else
   {
@@ -77,7 +87,8 @@ ErrorCode::ErrorCodeEnum Run::runsParser(Paragraph* paragraph)
     return ErrorCode::ErrorCodeEnum::FAILED;
   }
   // 获取运行块数量
-  runCount_ = runList_->getLength();
+  //runCount_ = runList_->getLength();
+  runCount_ = runListXPath_->getSnapshotLength();
   // 重置运行块索引
   resetRunIndex();
   return ErrorCode::ErrorCodeEnum::SUCCESS;
@@ -94,13 +105,15 @@ ErrorCode::ErrorCodeEnum Run::getRunIndex(int* index) const
   *index = runIndex_;
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-ErrorCode::ErrorCodeEnum Run::getRun(xercesc_3_2::DOMNode** run) const
+ErrorCode::ErrorCodeEnum Run::getRun(XERCES_CPP_NAMESPACE::DOMNode** run) const
 {
   // 获取当前运行块
-  *run = runList_->item(runIndex_);
+  // *run = runList_->item(runIndex_);
+  runListXPath_->snapshotItem(runIndex_);
+  *run = runListXPath_->getNodeValue();
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-ErrorCode::ErrorCodeEnum Run::getNextRun(xercesc_3_2::DOMNode** run)
+ErrorCode::ErrorCodeEnum Run::getNextRun(XERCES_CPP_NAMESPACE::DOMNode** run)
 {
   // 检查运行块索引是否超出范围
   if (runIndex_ >= runCount_)
@@ -112,7 +125,7 @@ ErrorCode::ErrorCodeEnum Run::getNextRun(xercesc_3_2::DOMNode** run)
   ++runIndex_;
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-ErrorCode::ErrorCodeEnum Run::getPreviousRun(xercesc_3_2::DOMNode** run)
+ErrorCode::ErrorCodeEnum Run::getPreviousRun(XERCES_CPP_NAMESPACE::DOMNode** run)
 {
   // 检查运行块索引是否超出范围
   if (runIndex_ < 0)
@@ -139,7 +152,7 @@ ErrorCode::ErrorCodeEnum Run::getRunText(std::string* text)
   // 检查运行块是否为空
   if (tempRun == nullptr)
   {
-    std::cerr << "运行块为空" << std::endl;
+    std::cerr << "run is empty" << std::endl;
     return ErrorCode::ErrorCodeEnum::FAILED;
   }
   // 获取运行块的Text
@@ -151,7 +164,7 @@ ErrorCode::ErrorCodeEnum Run::getRunText(std::string* text)
 
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-ErrorCode::ErrorCodeEnum Run::getRunProperties(xercesc_3_2::DOMNode** runProperties) const
+ErrorCode::ErrorCodeEnum Run::getRunProperties(XERCES_CPP_NAMESPACE::DOMNode** runProperties) const
 {
   // 临时保存运行块
   XERCES_CPP_NAMESPACE::DOMNode* tempRun = nullptr;
@@ -160,7 +173,7 @@ ErrorCode::ErrorCodeEnum Run::getRunProperties(xercesc_3_2::DOMNode** runPropert
   // 检查运行块是否为空
   if (tempRun == nullptr)
   {
-    std::cerr << "运行块为空" << std::endl;
+    std::cerr << "run is empty" << std::endl;
     return ErrorCode::ErrorCodeEnum::FAILED;
   }
   // 获取段落的<w:rPr>标签, 该标签包含段落的属性,<w:rPr>标签是<w:r>标签的第一个子标签

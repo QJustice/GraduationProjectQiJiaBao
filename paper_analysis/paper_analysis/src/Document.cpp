@@ -131,7 +131,7 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
     }
     //std::cout << "Paragraph: " << text << std::endl;
 
-    Run runs(&paragraphs_);
+    Run runs(&paragraphs_, document_);
     XMLSize_t runCount = 0;
     runs.getRunCount(&runCount);
     for (XMLSize_t j = 0; j < runCount; ++j)
@@ -144,7 +144,6 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
       eraseSpaces.eraseSpaces(text);
       // 清除换行符
       eraseSpaces.eraseNewLine(text);
-      //std::cout << text << std::endl;
       XMLSize_t *index = nullptr;
       documentTemplate_.findKeyword(text, &index);
       if (index != nullptr)

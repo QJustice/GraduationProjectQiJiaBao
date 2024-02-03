@@ -30,6 +30,7 @@
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMXPathResult.hpp>
 
 #include "ErrorCode.h"
 #include "TransString.h"
@@ -48,7 +49,9 @@ private:
   // 文档
   XERCES_CPP_NAMESPACE::DOMDocument* document_ = nullptr;
   // <w:p> list
-  XERCES_CPP_NAMESPACE::DOMNodeList* paragraphList_ = nullptr;
+  XERCES_CPP_NAMESPACE::DOMNodeList* paragrap1hList_ = nullptr;
+  // <w:p> list XPath
+  XERCES_CPP_NAMESPACE::DOMXPathResult* paragraphListXPath_ = nullptr;
   // 段落索引
   int paragraphIndex_ = 0;
   // 段落数量

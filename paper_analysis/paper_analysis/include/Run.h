@@ -27,6 +27,8 @@
 
 #include <string>
 
+#include <xercesc/dom/DOMXPathResult.hpp>
+
 #include "ErrorCode.h"
 #include "Paragraph.h"
 #include "TransString.h"
@@ -35,22 +37,27 @@ namespace qi {
 
 class Run {
 private:
+  // 文档
+  XERCES_CPP_NAMESPACE::DOMDocument* doc_ = nullptr;
   // 段落
   Paragraph* paragraph_ = nullptr;
   // <w:r> list
   XERCES_CPP_NAMESPACE::DOMNodeList* runList_ = nullptr;
+  // <w:r> list XPath
+  XERCES_CPP_NAMESPACE::DOMXPathResult* runListXPath_ = nullptr;
   // 运行块索引
   int runIndex_ = 0;
   // 运行块数量
   XMLSize_t runCount_ = 0;
   // 字符串转换工具
   TransString transString_;
+
 public:
   Run();
-  explicit Run(Paragraph* paragraph);
+  explicit Run(Paragraph* paragraph, XERCES_CPP_NAMESPACE::DOMDocument* doc);
   ~Run() = default;
   // 获取段落的所有<w:r>标签
-  ErrorCode::ErrorCodeEnum runsParser(Paragraph* paragraph);
+  ErrorCode::ErrorCodeEnum runsParser(Paragraph* paragraph, XERCES_CPP_NAMESPACE::DOMDocument* doc);
   // 获取运行块数量
   ErrorCode::ErrorCodeEnum getRunCount(XMLSize_t* count) const;
   // 获取当前运行块索引

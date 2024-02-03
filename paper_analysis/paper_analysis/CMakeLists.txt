@@ -51,6 +51,7 @@ set(SOURCE
         include/NodeToElement.h
         include/EraseSpaces.h
         include/TransString.h
+        include/FindElements.h
         src/main.cpp
         src/Document.cpp
         src/Paragraph.cpp
@@ -65,6 +66,7 @@ set(SOURCE
         tools/NodeToElement.cpp
         tools/EraseSpaces.cpp
         tools/TransString.cpp
+        tools/FindElements.cpp
 )
 
 # 将源代码添加到此项目的可执行文件。
