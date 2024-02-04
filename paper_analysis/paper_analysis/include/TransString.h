@@ -46,6 +46,8 @@ public:
   ErrorCode::ErrorCodeEnum xmlCharToChar(const XMLCh* toTranscode, char** charStr);
   // 将 char 字符串转换为 XMLCh 字符串
   ErrorCode::ErrorCodeEnum charToXMLCh(const char* toTranscode, XMLCh** xmlStr);
+  // // 把XMLSize_t转换为XMLCh
+  ErrorCode::ErrorCodeEnum xmlsize_tToXMLCh(const XMLSize_t toTranscode, XMLCh** xmlStr);
 };
 
 }// namespace qi

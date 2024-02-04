@@ -112,12 +112,15 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
 {
   // 清除所有空格
   EraseSpaces eraseSpaces;
-  // 打印出所有段落中的文本
+  // 获取段落数量
   XMLSize_t paragraphCount = 0;
   paragraphs_.getParagraphCount(&paragraphCount);
+  // 标记是否检测
+  bool isCheck = false;
+  // 打印出所有段落中的文本
   for (XMLSize_t i = 0; i < paragraphCount; ++i)
   {
-    // 获取段落文本
+    // 保存获取的文本
     std::string text;
     paragraphs_.getParagraphText(text);
     // 清除空格
@@ -130,15 +133,16 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
       continue;
     }
     //std::cout << "Paragraph: " << text << std::endl;
-
+    // 解析段落中的run
     Run runs(&paragraphs_, document_);
-    XMLSize_t runCount = 0;
-    runs.getRunCount(&runCount);
+    XMLSize_t runCount = 0;                      // 段落中的run数量
+    runs.getRunCount(&runCount);                 // 获取run数量
+    XERCES_CPP_NAMESPACE::DOMNode *run = nullptr;// run 节点
     for (XMLSize_t j = 0; j < runCount; ++j)
     {
-      XERCES_CPP_NAMESPACE::DOMNode *run = nullptr;
+      // 获取run节点
       runs.getRun(&run);
-      std::string text;
+      // 获取run文本
       runs.getRunText(&text);
       // 使用标准库的算法和迭代器去除空白字符
       eraseSpaces.eraseSpaces(text);
@@ -148,7 +152,14 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
       documentTemplate_.findKeyword(text, &index);
       if (index != nullptr)
       {
+        isCheck = true;
         std::cout << "Keyword: " << text << " Index: " << *index << std::endl;
+      }
+      if (isCheck)
+      {
+        XERCES_CPP_NAMESPACE::DOMNode* paragraph = nullptr;
+        paragraphs_.getParagraph(&paragraph);
+        documentTemplate_.checkRun(run, text, paragraph);
       }
       runs.getNextRun(&run);
     }

@@ -131,7 +131,7 @@ ErrorCode::ErrorCodeEnum Paragraph::resetParagraphIndex()
   paragraphIndex_ = 0;
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-ErrorCode::ErrorCodeEnum Paragraph::getParagraphProperty(xercesc_3_2::DOMNode** paragraphProperty) const
+ErrorCode::ErrorCodeEnum Paragraph::getParagraphProperty(XERCES_CPP_NAMESPACE::DOMNode** paragraphProperty)
 {
   // 临时保存段落
   XERCES_CPP_NAMESPACE::DOMNode* paragraph = nullptr;
@@ -143,6 +143,7 @@ ErrorCode::ErrorCodeEnum Paragraph::getParagraphProperty(xercesc_3_2::DOMNode** 
     return ErrorCode::ErrorCodeEnum::FAILED;
   }
   // 获取段落的<w:pPr>标签, 该标签包含段落的属性,<w:pPr>标签是<w:p>标签的第一个子标签
+  std::cout << "namexxx: " << XERCES_CPP_NAMESPACE::XMLString::transcode(paragraph->getLocalName()) << std::endl;
   *paragraphProperty = paragraph->getFirstChild();
 
   return ErrorCode::ErrorCodeEnum::SUCCESS;

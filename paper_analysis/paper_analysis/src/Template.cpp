@@ -33,6 +33,8 @@
 
 #include "CommandParser.h"
 #include "EraseSpaces.h"
+#include "FindElements.h"
+#include "NodeToElement.h"
 #include "StringExtractor.h"
 #include "XMLParserFactory.h"
 
@@ -40,17 +42,17 @@ namespace qi {
 Template::Template()
 {
   // 初始化模板关键字
-//  keywords_ =
-//          {
-//                  {"本科毕业论文（设计", 0},
-//                  {"毕业论文原创性声明", 1},
-//                  {"目录", 2},
-//                  {"摘要", 3},
-//                  {"关键字", 4},
-//                  {"Abstract", 5},
-//                  {"Keywords", 6},
-//                  {"致谢", 7},
-//                  {"参考文献", 8}};
+  //  keywords_ =
+  //          {
+  //                  {"本科毕业论文（设计", 0},
+  //                  {"毕业论文原创性声明", 1},
+  //                  {"目录", 2},
+  //                  {"摘要", 3},
+  //                  {"关键字", 4},
+  //                  {"Abstract", 5},
+  //                  {"Keywords", 6},
+  //                  {"致谢", 7},
+  //                  {"参考文献", 8}};
 
   // 创建 XMLParserFactory 对象并构建 DOM 解析器
   XMLParserFactory::createDOMParser("setting01", &templateParser_);
@@ -105,17 +107,39 @@ ErrorCode::ErrorCodeEnum Template::parseTemplateFile()
   // 保存div
   XERCES_CPP_NAMESPACE::DOMNode *div = nullptr;
   // 保存转换后的字符串
-  char* text1 = nullptr;
+  char *text1 = nullptr;
   // 保存处理后的字符串
-  std::string text2="";
+  std::string text2 = "";
   // 清除所有空格
   EraseSpaces eraseSpaces;
+  // 节点转换为元素
+  NodeToElement nodeToElement;
   // 遍历<div>标签
   for (XMLSize_t i = 0; i < keywordCount_; i++)
   {
     // 获取<div>标签
     div = divList->item(i);
-    transString_.xmlCharToChar(div->getTextContent(), &text1);
+    // 保存转换成DOMElement的元素
+    XERCES_CPP_NAMESPACE::DOMElement *element = nullptr;
+    nodeToElement.nodeToElement(div, &element);
+    // 保存转换成XMLCh的元素
+    XMLCh *xmlString = nullptr;
+    transString_.charToXMLCh("name", &xmlString);
+    // 获取name标签,name标签只有一个，因为是关键字
+    XERCES_CPP_NAMESPACE::DOMNodeList *elementlist = element->getElementsByTagName(xmlString);
+    if (elementlist->getLength() > 1)
+    {
+      std::cerr << "name is more then one" << std::endl;
+      // 打印所有的name
+      for (XMLSize_t j = 0; j < elementlist->getLength(); j++)
+      {
+        XERCES_CPP_NAMESPACE::DOMNode *name = elementlist->item(j);
+        std::cout << "name: " << XERCES_CPP_NAMESPACE::XMLString::transcode(name->getTextContent()) << std::endl;
+      }
+      return qi::ErrorCode::ErrorCodeEnum::FAILED;
+    }
+    XERCES_CPP_NAMESPACE::DOMNode *name = elementlist->item(0);
+    transString_.xmlCharToChar(name->getTextContent(), &text1);
     text2 = text1;
     // 清除空格
     eraseSpaces.eraseSpaces(text2);
@@ -123,6 +147,11 @@ ErrorCode::ErrorCodeEnum Template::parseTemplateFile()
     eraseSpaces.eraseNewLine(text2);
     keywords_.insert(std::make_pair(text2, i));
   }
+  //    // 打印关键字
+  //    for (auto &keyword : keywords_)
+  //    {
+  //      std::cout << "Keywordxxx: " << keyword.first << " Index: " << keyword.second << std::endl;
+  //    }
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 ErrorCode::ErrorCodeEnum Template::findKeyword(const std::string keyword, XMLSize_t **index)
@@ -143,6 +172,147 @@ ErrorCode::ErrorCodeEnum Template::findKeyword(const std::string keyword, XMLSiz
   *index = &iter->second;
   return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
 }
+
+ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNode *run, XERCES_CPP_NAMESPACE::DOMNode **rpr)
+{
+  // 遍历run的所有孩子节点获取rpr样式
+  XERCES_CPP_NAMESPACE::DOMNode *rprNode = nullptr;
+  XERCES_CPP_NAMESPACE::DOMNode *tempNode = nullptr;
+  XERCES_CPP_NAMESPACE::DOMNodeList *children = run->getChildNodes();
+  for (XMLSize_t i = 0; i < children->getLength(); ++i)
+  {
+    tempNode = children->item(i);
+    if (tempNode->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE)
+    {
+      XMLCh *rprSting = nullptr;
+      transString_.charToXMLCh("w:rPr", &rprSting);
+      // TODO: 2024/1/7 getLocalName() 要改成 getNodeName()
+      if (XERCES_CPP_NAMESPACE::XMLString::equals(tempNode->getLocalName(), rprSting))
+      {
+        rprNode = tempNode;
+        break;
+      }
+    }
+  }
+  // 检查rpr是否为空
+  if (rprNode == nullptr)
+  {
+    std::cerr << "Rpr is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  *rpr = rprNode;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+
+ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode *paragraph, XERCES_CPP_NAMESPACE::DOMNode **ppr)
+{
+ // 遍历p的所有孩子节点获取rPr样式
+  XERCES_CPP_NAMESPACE::DOMNode *pprNode = nullptr;
+  XERCES_CPP_NAMESPACE::DOMNode *tempNode = nullptr;
+  XERCES_CPP_NAMESPACE::DOMNodeList *children = paragraph->getChildNodes();
+  for (XMLSize_t i = 0; i < children->getLength(); ++i)
+  {
+    tempNode = children->item(i);
+    if (tempNode->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE)
+    {
+      XMLCh *pprSting = nullptr;
+      transString_.charToXMLCh("w:pPr", &pprSting);
+      // TODO: 2024/1/7 getLocalName() 要改成 getNodeName()
+      if (XERCES_CPP_NAMESPACE::XMLString::equals(tempNode->getLocalName(), pprSting))
+      {
+        pprNode = tempNode;
+        break;
+      }
+    }
+  }
+  // 检查rpr是否为空
+  if (pprNode == nullptr)
+  {
+    std::cerr << "Ppr is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  *ppr = pprNode;
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+
+ErrorCode::ErrorCodeEnum Template::checkRun(const XERCES_CPP_NAMESPACE::DOMNode *run, const std::string keyword,  const XERCES_CPP_NAMESPACE::DOMNode* paragraphs)
+{
+  // 检查关键字是否为空
+  if (keyword.empty())
+  {
+    std::cerr << "Keyword is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 检查run是否为空
+  if (run == nullptr)
+  {
+    std::cerr << "Run is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 根据关键字获取样式
+  XERCES_CPP_NAMESPACE::DOMNode *style = nullptr;
+  getStyleFromKey(keyword, &style);
+  // 检查样式是否为空
+  if (style == nullptr)
+  {
+    std::cerr << "Style File style is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  char *text = nullptr;
+  transString_.xmlCharToChar(style->getTextContent(), &text);
+  std::cout << "name1: " << text << std::endl;
+
+  // 获取run的样式
+  XERCES_CPP_NAMESPACE::DOMNode *runStyle = nullptr;
+  getRunStyle(run, &runStyle);
+  // 检查run样式是否为空
+  if (runStyle == nullptr)
+  {
+    // std::cerr << "Run style is empty!" << std::endl;
+    getParagraphStyle(paragraphs, &runStyle);
+    if (runStyle == nullptr)
+    {
+      return qi::ErrorCode::ErrorCodeEnum::FAILED;
+    }
+  }
+  // 打印run样式
+  std::cout << "Run Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(runStyle->getNodeName()) << std::endl;
+
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum Template::getStyleFromKey(const std::string keyword, XERCES_CPP_NAMESPACE::DOMNode **style)
+{
+  // 遍历模板获取符合关键字的样式
+  // 更加关键字获取样式ID
+  XMLSize_t *index = nullptr;
+  findKeyword(keyword, &index);
+  if (index == nullptr)
+  {
+    std::cerr << "Keyword not found!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 把ID转换为XMLCh
+  XMLCh *styleId = nullptr;
+  transString_.xmlsize_tToXMLCh(*index, &styleId);
+  char *styleIdStr = nullptr;
+  transString_.xmlCharToChar(styleId, &styleIdStr);
+
+  XERCES_CPP_NAMESPACE::DOMNode *styleNode = nullptr;
+  FindElements findElements;
+
+  findElements.FindOneElementByID(template_->getDocumentElement(), "id", styleIdStr, &styleNode);
+  // 根据ID获取样式
+  // 检查样式是否为空
+  if (styleNode == nullptr)
+  {
+    std::cerr << "Style is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  *style = styleNode;
+
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+
 }// namespace qi
 
 

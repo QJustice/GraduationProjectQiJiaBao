@@ -34,6 +34,7 @@
 #include "ErrorCode.h"
 #include "DOMElementComparator.h"
 #include "TransString.h"
+#include "Run.h"
 
 namespace qi {
 
@@ -55,7 +56,6 @@ private:
   // 模板关键字, 关键字索引
   std::map<const std::string , XMLSize_t> keywords_;
 
-
 public:
   Template();
   Template(const std::string& templateFilePath);
@@ -67,6 +67,14 @@ public:
   ErrorCode::ErrorCodeEnum parseTemplateFile();
   // Find the keyword in the template
   ErrorCode::ErrorCodeEnum findKeyword(const std::string keyword, XMLSize_t** index);
+  // 获取rPr样式
+  ErrorCode::ErrorCodeEnum getRunStyle(const XERCES_CPP_NAMESPACE::DOMNode* run,XERCES_CPP_NAMESPACE::DOMNode** rpr);
+  // 获取pPr样式
+  ErrorCode::ErrorCodeEnum getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode* paragraph,XERCES_CPP_NAMESPACE::DOMNode** ppr);
+  // 检测目标run是否符合模板格式
+  ErrorCode::ErrorCodeEnum checkRun(const XERCES_CPP_NAMESPACE::DOMNode * run, const std::string keyword, const XERCES_CPP_NAMESPACE::DOMNode* paragraphs);
+  // 根据关键字获取模板样式
+  ErrorCode::ErrorCodeEnum getStyleFromKey(const std::string keyword, XERCES_CPP_NAMESPACE::DOMNode** style);
 };
 
 }// namespace qi

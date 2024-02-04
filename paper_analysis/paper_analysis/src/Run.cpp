@@ -164,20 +164,4 @@ ErrorCode::ErrorCodeEnum Run::getRunText(std::string* text)
 
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-ErrorCode::ErrorCodeEnum Run::getRunProperties(XERCES_CPP_NAMESPACE::DOMNode** runProperties) const
-{
-  // 临时保存运行块
-  XERCES_CPP_NAMESPACE::DOMNode* tempRun = nullptr;
-  // 获取当前运行块
-  getRun(&tempRun);
-  // 检查运行块是否为空
-  if (tempRun == nullptr)
-  {
-    std::cerr << "run is empty" << std::endl;
-    return ErrorCode::ErrorCodeEnum::FAILED;
-  }
-  // 获取段落的<w:rPr>标签, 该标签包含段落的属性,<w:rPr>标签是<w:r>标签的第一个子标签
-  *runProperties = tempRun->getFirstChild();
-  return ErrorCode::ErrorCodeEnum::SUCCESS;
-}
 }// namespace qi

@@ -72,8 +72,6 @@ public:
   ErrorCode::ErrorCodeEnum resetRunIndex();
   // 获取运行块文本
   ErrorCode::ErrorCodeEnum getRunText(std::string* text);
-  // 获取运行块<w:rPr>标签
-  ErrorCode::ErrorCodeEnum getRunProperties(XERCES_CPP_NAMESPACE::DOMNode** runProperties) const;
 };
 
 }// namespace qi

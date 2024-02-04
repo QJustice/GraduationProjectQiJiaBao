@@ -27,9 +27,9 @@
 
 #include <string>
 #include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 #include <xercesc/dom/DOMXPathEvaluator.hpp>
 #include <xercesc/dom/DOMXPathResult.hpp>
-#include <xercesc/dom/DOMNodeList.hpp>
 
 #include "ErrorCode.h"
 #include "TransString.h"
@@ -57,10 +57,16 @@ private:
 public:
   FindElements();
   ~FindElements();
+  // XPath搜索Element
   ErrorCode::ErrorCodeEnum FindElementByXPath(XERCES_CPP_NAMESPACE::DOMDocument* doc,
                                               XERCES_CPP_NAMESPACE::DOMElement* parentElement,
                                               const std::string& XPathExpression,
                                               XERCES_CPP_NAMESPACE::DOMXPathResult** result);
+  // ID 搜索 Element
+  ErrorCode::ErrorCodeEnum FindOneElementByID(XERCES_CPP_NAMESPACE::DOMElement* parentElement,
+                                              const std::string& targeID,
+                                              const std::string& id,
+                                              XERCES_CPP_NAMESPACE::DOMNode** result);
 };
 
 }// namespace qi

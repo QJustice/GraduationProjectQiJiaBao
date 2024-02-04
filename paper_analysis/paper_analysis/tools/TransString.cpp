@@ -24,6 +24,8 @@
 // Additional comments or code go here
 #include "TransString.h"
 
+#include <string>
+
 namespace qi {
 TransString::TransString()
 {
@@ -71,6 +73,16 @@ ErrorCode::ErrorCodeEnum TransString::charToXMLCh(const char *toTranscode, XMLCh
   *xmlStr = tempXMLCh;
   // 保存转换后的 XMLCh 字符串, 用于释放内存
   xmlStrings_.push_back(tempXMLCh);
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum TransString::xmlsize_tToXMLCh(const XMLSize_t toTranscode, XMLCh **xmlStr)
+{
+    // 把XMLSize_t转换为XMLCh
+  XMLCh *xmlString = XERCES_CPP_NAMESPACE::XMLString::transcode(std::to_string(toTranscode).c_str());
+  // 带出转换后的 XMLCh 字符串
+  *xmlStr = xmlString;
+  // 保存转换后的 XMLCh 字符串, 用于释放内存
+  xmlStrings_.push_back(xmlString);
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 }// namespace qi

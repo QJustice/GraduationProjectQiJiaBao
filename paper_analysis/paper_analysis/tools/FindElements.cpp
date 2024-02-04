@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNamedNodeMap.hpp>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMXPathEvaluator.hpp>
 #include <xercesc/dom/DOMXPathException.hpp>
@@ -97,6 +98,50 @@ ErrorCode::ErrorCodeEnum FindElements::FindElementByXPath(XERCES_CPP_NAMESPACE::
       // 调用 xmlCharToChar 函数将 XMLCh* 转换为 char*
       transString_.xmlCharToChar(element->getTagName(), &text);
       //std::cout << "name: " << text << std::endl;
+    }
+  }
+
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum FindElements::FindOneElementByID(xercesc_3_2::DOMElement* parentElement, const std::string& targeID, const std::string& id, XERCES_CPP_NAMESPACE::DOMNode** result)
+{
+  // 检查父节点是否为空
+  if (parentElement == nullptr)
+  {
+    std::cerr << "父节点为空" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 检查id是否为空
+  if (id.empty())
+  {
+    std::cerr << "id为空" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 遍历寻找id==id的节点
+  for (XERCES_CPP_NAMESPACE::DOMNode* node = parentElement->getFirstChild(); node != nullptr; node = node->getNextSibling())
+  {
+    XMLCh* targetID = nullptr;
+    transString_.charToXMLCh(targeID.c_str(), &targetID);
+//    // 打印节点名
+//    char* text = nullptr;
+//    transString_.xmlCharToChar(node->getNodeName(), &text);
+//    std::cout << "name: " << text << std::endl;
+    // 遍历node的所有属性
+    if (node->getAttributes() == nullptr)
+    {
+      continue;
+    }
+    for (XERCES_CPP_NAMESPACE::DOMNode* attr = node->getAttributes()->getNamedItem(targetID); attr != nullptr; attr = attr->getNextSibling())
+    {
+      // 获取属性值
+      char* text = nullptr;
+      transString_.xmlCharToChar(attr->getTextContent(), &text);
+      // 检查属性值是否等于id
+      if (id == text)
+      {
+          *result = node;
+          return ErrorCode::ErrorCodeEnum::SUCCESS;
+      }
     }
   }
 

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--<Template>-->
 <!--    <div id="0">-->
 <!--        <name>AAA</name>-->
@@ -11,11 +12,12 @@
 <!--</Template>-->
 
 
-
-
 <Template>
     <div id="0">
         <name>本科毕业论文（设计）</name>
+        <font>华文新魏</font>
+        <fontsize>72</fontsize>
+        <kern>2</kern>              <!-- 字间距 -->
     </div>
     <div id="1">
         <name>毕业论文原创性声明</name>
@@ -44,14 +46,14 @@
 </Template>
 
 
-<!--          {"本科毕业论文（设计", 0},
-                  {"毕业论文原创性声明", 1},
-                  {"目录", 2},
-                  {"摘要", 3},
-                  {"关键字", 4},
-                  {"Abstract", 5},
-                  {"Keywords", 6},
-                  {"致谢", 7},
-                  {"参考文献", 8}}; -->
+        <!--          {"本科毕业论文（设计", 0},
+                          {"毕业论文原创性声明", 1},
+                          {"目录", 2},
+                          {"摘要", 3},
+                          {"关键字", 4},
+                          {"Abstract", 5},
+                          {"Keywords", 6},
+                          {"致谢", 7},
+                          {"参考文献", 8}}; -->
 
-<!-- Path: paper_analysis/data/Template/Undergraduate/test03.xml -->
+        <!-- Path: paper_analysis/data/Template/Undergraduate/test03.xml -->

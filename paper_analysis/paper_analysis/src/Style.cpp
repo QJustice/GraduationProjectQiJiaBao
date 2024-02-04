@@ -56,7 +56,7 @@ ErrorCode::ErrorCodeEnum Style::loadStyle(const std::string &stylePath)
   // 检测样式是否为空
   if (style_ == nullptr)
   {
-    std::cerr << "Style is empty!" << std::endl;
+    std::cerr << "Style File is empty!" << std::endl;
     return ErrorCode::ErrorCodeEnum::FAILED;
   }
   return ErrorCode::ErrorCodeEnum::SUCCESS;

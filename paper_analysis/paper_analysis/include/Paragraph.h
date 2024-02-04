@@ -80,7 +80,7 @@ public:
   // 获取段落的文本
   ErrorCode::ErrorCodeEnum getParagraphText(std::string& text);
   // 获取段落的<w:pPr>标签
-  ErrorCode::ErrorCodeEnum getParagraphProperty(XERCES_CPP_NAMESPACE::DOMNode** paragraphProperty) const;
+  ErrorCode::ErrorCodeEnum getParagraphProperty(XERCES_CPP_NAMESPACE::DOMNode** paragraphProperty);
 };
 
 }// namespace qi
