@@ -90,6 +90,18 @@ ErrorCode::ErrorCodeEnum Template::openTemplateFile(const std::string &templateF
   parseTemplateFile();
   return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
 }
+
+ErrorCode::ErrorCodeEnum Template::setStyleFile(const std::string &styleFilePath)
+{
+  if (styleFilePath.empty())
+  {
+    std::cerr << "Template path is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  style_.loadStyle(styleFilePath);
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+
 ErrorCode::ErrorCodeEnum Template::parseTemplateFile()
 {
   // 检查模板是否为空
@@ -206,7 +218,7 @@ ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNo
 
 ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode *paragraph, XERCES_CPP_NAMESPACE::DOMNode **ppr)
 {
- // 遍历p的所有孩子节点获取rPr样式
+  // 遍历p的所有孩子节点获取rPr样式
   XERCES_CPP_NAMESPACE::DOMNode *pprNode = nullptr;
   XERCES_CPP_NAMESPACE::DOMNode *tempNode = nullptr;
   XERCES_CPP_NAMESPACE::DOMNodeList *children = paragraph->getChildNodes();
@@ -235,7 +247,7 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 
-ErrorCode::ErrorCodeEnum Template::checkRun(const XERCES_CPP_NAMESPACE::DOMNode *run, const std::string keyword,  const XERCES_CPP_NAMESPACE::DOMNode* paragraphs)
+ErrorCode::ErrorCodeEnum Template::checkRun(const XERCES_CPP_NAMESPACE::DOMNode *run, const std::string keyword, const XERCES_CPP_NAMESPACE::DOMNode *paragraphs)
 {
   // 检查关键字是否为空
   if (keyword.empty())
@@ -272,7 +284,12 @@ ErrorCode::ErrorCodeEnum Template::checkRun(const XERCES_CPP_NAMESPACE::DOMNode 
     getParagraphStyle(paragraphs, &runStyle);
     if (runStyle == nullptr)
     {
-      return qi::ErrorCode::ErrorCodeEnum::FAILED;
+      style_.defaultStyle(&runStyle);
+      if (runStyle == nullptr)
+      {
+        std::cerr << "Run style all is empty!" << std::endl;
+        return qi::ErrorCode::ErrorCodeEnum::FAILED;
+      }
     }
   }
   // 打印run样式

@@ -48,6 +48,8 @@ private:
   XERCES_CPP_NAMESPACE::DOMDocument* document_;
   // 文档路径
   std::string documentPath_;
+  // Style 样式路径
+  std::string styleFilePath_;
   // 文档名称
   std::string documentName_;
   // <w:p> 段落
@@ -56,8 +58,6 @@ private:
   Run runs_;
   // <w:sectPr> 节属性
   // Section section_;
-  // <w:style> 样式
-  Style styles_;
   // 字符串转换
   TransString transString_;
   // 模板信息
@@ -68,9 +68,11 @@ public:
   Document(const std::string &documentFilePath, const std::string &templateFilePath);
   ~Document();
   // open document
-  ErrorCode::ErrorCodeEnum loadDocument(const std::string& documentFilePath, const std::string &templateFilePath);
+  ErrorCode::ErrorCodeEnum loadDocument(const std::string& documentFilePath);
   // set Template
   ErrorCode::ErrorCodeEnum setTemplate(const std::string& templateFilePath);
+  // set Style path
+  ErrorCode::ErrorCodeEnum setStyle(const std::string& styleFilePath);
   // 检测
   ErrorCode::ErrorCodeEnum checkDocument();
 };

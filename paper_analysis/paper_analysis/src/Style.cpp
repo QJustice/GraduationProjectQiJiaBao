@@ -25,15 +25,14 @@
 #include "Style.h"
 
 #include <iostream>
-
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
 #include <xercesc/util/XMLString.hpp>
 
-#include "XMLParserFactory.h"
 #include "NodeToElement.h"
+#include "XMLParserFactory.h"
 
 namespace qi {
 Style::Style()
@@ -68,20 +67,19 @@ Style::Style(const std::string &stylePath)
   // 加载样式
   loadStyle(stylePath);
 }
-ErrorCode::ErrorCodeEnum Style::defaultStyle(xercesc_3_2::DOMElement **styleElement)
+ErrorCode::ErrorCodeEnum Style::defaultStyle(XERCES_CPP_NAMESPACE::DOMNode **styleNode)
 {
   // 检测样式元素是否为空
-  if (styleElement == nullptr)
+  if (styleNode == nullptr)
   {
     std::cerr << "Style element is empty!" << std::endl;
     return ErrorCode::ErrorCodeEnum::FAILED;
   }
   // 调用 transcode 函数将 string 转换为 XMLCh
-  XMLCh *xmlString = XERCES_CPP_NAMESPACE::XMLString::transcode("w:docDefaults");
+  XMLCh *xmlString = nullptr;
+  transString_.charToXMLCh("w:docDefaults", &xmlString);
   // 获取默认样式
   XERCES_CPP_NAMESPACE::DOMNodeList *defaultStyleElements = style_->getElementsByTagName(xmlString);
-  // 释放内存
-  XERCES_CPP_NAMESPACE::XMLString::release(&xmlString);
   // 检测默认样式元素是否为空
   if (defaultStyleElements->getLength() == 0)
   {
@@ -94,18 +92,9 @@ ErrorCode::ErrorCodeEnum Style::defaultStyle(xercesc_3_2::DOMElement **styleElem
     std::cerr << "More than one default style element!" << std::endl;
     return ErrorCode::ErrorCodeEnum::FAILED;
   }
-  // 保存转换后的样式元素
-  XERCES_CPP_NAMESPACE::DOMElement *tempElement = nullptr;
-  NodeToElement nodeToElement;
-  if (ErrorCode::ErrorCodeEnum::SUCCESS == nodeToElement.nodeToElement(defaultStyleElements->item(0), &tempElement))
-  {
-    // 保存样式元素
-    *styleElement = tempElement;
-  } else
-  {
-    std::cerr << "Failed to convert node to element!" << std::endl;
-    return ErrorCode::ErrorCodeEnum::FAILED;
-  }
+  // 保存样式元素
+  *styleNode = defaultStyleElements->item(0);
+
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 ErrorCode::ErrorCodeEnum Style::findStyleByStyleId(const std::string &styleId, xercesc_3_2::DOMElement **styleElement)

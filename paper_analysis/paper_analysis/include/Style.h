@@ -26,11 +26,11 @@
 #define PAPER_ANALYSIS_STYLE_H
 
 #include <string>
-
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMLSParser.hpp>
 
 #include "ErrorCode.h"
+#include "TransString.h"
 
 namespace qi {
 
@@ -42,6 +42,8 @@ private:
   XERCES_CPP_NAMESPACE::DOMDocument* style_;
   // 样式路径
   std::string stylePath_;
+  // 字符串转换工具
+  TransString transString_;
 public:
   Style();
   Style(const std::string& stylePath);
@@ -49,7 +51,7 @@ public:
   // 加载样式
   ErrorCode::ErrorCodeEnum loadStyle(const std::string& stylePath);
   // 获取默认样式
-  ErrorCode::ErrorCodeEnum defaultStyle(XERCES_CPP_NAMESPACE::DOMElement** styleElement);
+  ErrorCode::ErrorCodeEnum defaultStyle(XERCES_CPP_NAMESPACE::DOMNode** styleNode);
   // 通过样式 ID 查找样式
   ErrorCode::ErrorCodeEnum findStyleByStyleId(const std::string& styleId, XERCES_CPP_NAMESPACE::DOMElement** styleElement);
 };

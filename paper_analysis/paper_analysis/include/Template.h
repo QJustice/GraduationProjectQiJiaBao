@@ -34,6 +34,7 @@
 #include "ErrorCode.h"
 #include "DOMElementComparator.h"
 #include "TransString.h"
+#include "Style.h"
 #include "Run.h"
 
 namespace qi {
@@ -51,6 +52,8 @@ private:
   std::string templateName_;
   // 关键字数量
   XMLSize_t keywordCount_;
+  // Style 样式
+  Style style_;
   // 字符串转换工具
   TransString transString_;
   // 模板关键字, 关键字索引
@@ -63,6 +66,8 @@ public:
 
   // 打开模板文件
   ErrorCode::ErrorCodeEnum openTemplateFile(const std::string& templateFilePath);
+  // 加载模板文件
+  ErrorCode::ErrorCodeEnum setStyleFile(const std::string& styleFilePath);
   // 解析模板文件
   ErrorCode::ErrorCodeEnum parseTemplateFile();
   // Find the keyword in the template

@@ -55,7 +55,7 @@ Document::Document(const std::string &documentFilePath, const std::string &templ
   // 创建 XMLParserFactory 对象并构建 DOM 解析器
   XMLParserFactory::createDOMParser("setting01", &documentParser_);
   // 打开文档，确保templateFilePath不为空
-  loadDocument(documentFilePath, templateFilePath);
+  loadDocument(documentFilePath);
 }
 Document::~Document()
 {
@@ -63,16 +63,8 @@ Document::~Document()
   documentParser_->release();
 }
 // 打开文档
-ErrorCode::ErrorCodeEnum Document::loadDocument(const std::string &documentFilePath, const std::string &templateFilePath)
+ErrorCode::ErrorCodeEnum Document::loadDocument(const std::string &documentFilePath)
 {
-  // 检测模板路径是否为空
-  if (templateFilePath.empty())
-  {
-    std::cerr << "Template path is empty!" << std::endl;
-    return qi::ErrorCode::ErrorCodeEnum::FAILED;
-  }
-  // 设置模板
-  setTemplate(templateFilePath);
   // 检查文档路径是否为空
   if (documentFilePath.empty())
   {
@@ -94,6 +86,7 @@ ErrorCode::ErrorCodeEnum Document::loadDocument(const std::string &documentFileP
   // 获取文档的所有<w:p>标签
   paragraphs_.paragraphsParser(document_);
 
+
   return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 ErrorCode::ErrorCodeEnum Document::setTemplate(const std::string &templateFilePath)
@@ -108,6 +101,22 @@ ErrorCode::ErrorCodeEnum Document::setTemplate(const std::string &templateFilePa
   documentTemplate_.openTemplateFile(templateFilePath);
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
+
+ErrorCode::ErrorCodeEnum Document::setStyle(const std::string &styleFilePath)
+{
+  // 检查样式路径是否为空
+  if (styleFilePath.empty())
+  {
+    std::cerr << "Style path is empty!" << std::endl;
+    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  styleFilePath_ = styleFilePath;
+  // 设置样式文件
+  documentTemplate_.setStyleFile(styleFilePath_);
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+
+
 ErrorCode::ErrorCodeEnum Document::checkDocument()
 {
   // 清除所有空格
@@ -157,7 +166,7 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
       }
       if (isCheck)
       {
-        XERCES_CPP_NAMESPACE::DOMNode* paragraph = nullptr;
+        XERCES_CPP_NAMESPACE::DOMNode *paragraph = nullptr;
         paragraphs_.getParagraph(&paragraph);
         documentTemplate_.checkRun(run, text, paragraph);
       }
@@ -167,6 +176,5 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
   }
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-
 
 }// namespace qi
