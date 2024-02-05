@@ -97,7 +97,7 @@ ErrorCode::ErrorCodeEnum Style::defaultStyle(XERCES_CPP_NAMESPACE::DOMNode **sty
 
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
-ErrorCode::ErrorCodeEnum Style::findStyleByStyleId(const std::string &styleId, xercesc_3_2::DOMElement **styleElement)
+ErrorCode::ErrorCodeEnum Style::findStyleByStyleId(const std::string &styleId, XERCES_CPP_NAMESPACE::DOMElement **styleElement)
 {
   // 检测样式 ID 是否为空
   if (styleId.empty())
@@ -117,10 +117,13 @@ ErrorCode::ErrorCodeEnum Style::findStyleByStyleId(const std::string &styleId, x
   {
     // 获取样式
     nodeToElement.nodeToElement(styleElements->item(i), &tempElement);
+    XMLCh *styleIdXml = nullptr;
+    transString_.charToXMLCh("w:styleId", &styleIdXml);
     // 获取样式ID
-    const XMLCh *xmlString = tempElement->getAttribute(XERCES_CPP_NAMESPACE::XMLString::transcode("w:styleId"));
+    const XMLCh *xmlString = tempElement->getAttribute(styleIdXml);
     // 将 XMLCh 转换为 string
-    std::string tempStyleId = XERCES_CPP_NAMESPACE::XMLString::transcode(xmlString);
+    char* tempStyleId = nullptr;
+    transString_.xmlCharToChar(xmlString, &tempStyleId);
     // 检测样式ID是否匹配
     if (tempStyleId == styleId)
     {
