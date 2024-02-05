@@ -73,9 +73,9 @@ public:
   // Find the keyword in the template
   ErrorCode::ErrorCodeEnum findKeyword(const std::string keyword, XMLSize_t** index);
   // 获取rPr样式
-  ErrorCode::ErrorCodeEnum getRunStyle(const XERCES_CPP_NAMESPACE::DOMNode* run,XERCES_CPP_NAMESPACE::DOMNode** rpr);
+  ErrorCode::ErrorCodeEnum getRunStyle(const XERCES_CPP_NAMESPACE::DOMNode* run,XERCES_CPP_NAMESPACE::DOMNode** rpr, XERCES_CPP_NAMESPACE::DOMElement** styleRpr);
   // 获取pPr样式
-  ErrorCode::ErrorCodeEnum getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode* paragraph,XERCES_CPP_NAMESPACE::DOMNode** ppr);
+  ErrorCode::ErrorCodeEnum getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode* paragraph,XERCES_CPP_NAMESPACE::DOMNode** ppr, XERCES_CPP_NAMESPACE::DOMElement** stylePpr);
   // 检测目标run是否符合模板格式
   ErrorCode::ErrorCodeEnum checkRun(const XERCES_CPP_NAMESPACE::DOMNode * run, const std::string keyword, const XERCES_CPP_NAMESPACE::DOMNode* paragraphs);
   // 根据关键字获取模板样式

@@ -185,7 +185,7 @@ ErrorCode::ErrorCodeEnum Template::findKeyword(const std::string keyword, XMLSiz
   return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 
-ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNode *run, XERCES_CPP_NAMESPACE::DOMNode **rpr)
+ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNode *run, XERCES_CPP_NAMESPACE::DOMNode **rpr, XERCES_CPP_NAMESPACE::DOMElement **styleRpr)
 {
   // 是否有w:rPr
   bool hasRpr = false;
@@ -193,6 +193,7 @@ ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNo
   bool hasStyle = false;
   // 遍历run的所有孩子节点获取rpr样式
   XERCES_CPP_NAMESPACE::DOMNode *rprNode = nullptr;
+  XERCES_CPP_NAMESPACE::DOMElement *rprStyle = nullptr;
   XERCES_CPP_NAMESPACE::DOMNode *tempNode = nullptr;
   XERCES_CPP_NAMESPACE::DOMNodeList *children = run->getChildNodes();
   for (XMLSize_t i = 0; i < children->getLength(); ++i)
@@ -229,22 +230,24 @@ ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNo
           std::cerr << "Style is empty!" << std::endl;
           return qi::ErrorCode::ErrorCodeEnum::FAILED;
         }
-        rprNode = style;
+        rprStyle = style;
         break;
       }
     }
   }
   // 检查rpr是否为空
-  if (rprNode == nullptr)
+  if (rprNode != nullptr)
   {
-    std::cerr << "Rpr is empty!" << std::endl;
-    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+    *rpr = rprNode;
   }
-  *rpr = rprNode;
+  if (rprStyle != nullptr)
+  {
+    *styleRpr = rprStyle;
+  }
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 
-ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode *paragraph, XERCES_CPP_NAMESPACE::DOMNode **ppr)
+ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode *paragraph, XERCES_CPP_NAMESPACE::DOMNode **ppr, XERCES_CPP_NAMESPACE::DOMElement **stylePpr)
 {
   // 是否有w:pPr
   bool hasPpr = false;
@@ -252,6 +255,7 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
   bool hasStyle = false;
   // 遍历p的所有孩子节点获取rPr样式
   XERCES_CPP_NAMESPACE::DOMNode *pprNode = nullptr;
+  XERCES_CPP_NAMESPACE::DOMElement *pprStyle = nullptr;
   XERCES_CPP_NAMESPACE::DOMNode *tempNode = nullptr;
   XERCES_CPP_NAMESPACE::DOMNodeList *children = paragraph->getChildNodes();
   for (XMLSize_t i = 0; i < children->getLength(); ++i)
@@ -287,7 +291,7 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
           std::cerr << "Style is empty!" << std::endl;
           return qi::ErrorCode::ErrorCodeEnum::FAILED;
         }
-        pprNode = style;
+        pprStyle = style;
         // 打印
         std::cout << "Ppr Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(style->getNodeName()) << std::endl;
         break;
@@ -297,10 +301,12 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
   // 检查rpr是否为空
   if (pprNode == nullptr)
   {
-    std::cerr << "Ppr is empty!" << std::endl;
-    return qi::ErrorCode::ErrorCodeEnum::FAILED;
+      *ppr = pprNode;
   }
-  *ppr = pprNode;
+  if (pprStyle != nullptr)
+  {
+    *stylePpr = pprStyle;
+  }
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 
@@ -333,13 +339,14 @@ ErrorCode::ErrorCodeEnum Template::checkRun(const XERCES_CPP_NAMESPACE::DOMNode 
 
   // 获取run的样式
   XERCES_CPP_NAMESPACE::DOMNode *runStyle = nullptr;
-  getRunStyle(run, &runStyle);
+  XERCES_CPP_NAMESPACE::DOMElement *runStyleElement = nullptr;
+  getRunStyle(run, &runStyle, &runStyleElement);
   // 检查run样式是否为空
-  if (runStyle == nullptr)
+  if (runStyle == nullptr && runStyleElement == nullptr)
   {
-    // std::cerr << "Run style is empty!" << std::endl;
-    getParagraphStyle(paragraphs, &runStyle);
-    if (runStyle == nullptr)
+
+    getParagraphStyle(paragraphs, &runStyle, &runStyleElement);
+    if (runStyle == nullptr && runStyleElement == nullptr)
     {
       style_.defaultStyle(&runStyle);
       if (runStyle == nullptr)
@@ -350,8 +357,14 @@ ErrorCode::ErrorCodeEnum Template::checkRun(const XERCES_CPP_NAMESPACE::DOMNode 
     }
   }
   // 打印run样式
-  std::cout << "Run Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(runStyle->getNodeName()) << std::endl;
-
+  if (runStyle != nullptr)
+  {
+    std::cout << "Run Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(runStyle->getNodeName()) << std::endl;
+  }
+  if (runStyleElement != nullptr)
+  {
+    std::cout << "Run Style Element: " << XERCES_CPP_NAMESPACE::XMLString::transcode(runStyleElement->getNodeName()) << std::endl;
+  }
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 ErrorCode::ErrorCodeEnum Template::getStyleFromKey(const std::string keyword, XERCES_CPP_NAMESPACE::DOMNode **style)
