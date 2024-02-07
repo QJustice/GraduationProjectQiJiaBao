@@ -146,14 +146,7 @@ ErrorCode::ErrorCodeEnum Template::parseTemplateFile()
   //      std::cout << "Keywordxxx: " << keyword.first << " Index: " << keyword.second << std::endl;
   //    }
   // 获取所有的div标签
-  transString_.charToXMLCh("div", &tagName);
-  divList_ = root->getElementsByTagName(tagName);
-  //  // 遍历div标签打印
-  //  for (XMLSize_t i = 0; i < tagDivs->getLength(); ++i)
-  //  {
-  //    XERCES_CPP_NAMESPACE::DOMNode *div = tagDivs->item(i);
-  //    std::cout << "Div: " << XERCES_CPP_NAMESPACE::XMLString::transcode(div->getFirstChild()->getNextSibling()->getTextContent()) << std::endl;
-  //  }
+
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 ErrorCode::ErrorCodeEnum Template::findKeyword(const std::string keyword, int &index)
@@ -164,11 +157,13 @@ ErrorCode::ErrorCodeEnum Template::findKeyword(const std::string keyword, int &i
     //std::cerr << "Keyword is empty!" << std::endl;
     return qi::ErrorCode::ErrorCodeEnum::FAILED;
   }
-  //vector
+  // 遍历vector 找到符合关键字的索引
   for (XMLSize_t i = 0; i < keywords_.size(); i++)
   {
+    // vector 结构是关键字和关键字的节点指针，所以要获取关键字的话就要用first
     if (keywords_[i].first == keyword)
     {
+      // 找到关键字
       index = i;
       return qi::ErrorCode::ErrorCodeEnum::SUCCESS;
     }
@@ -196,7 +191,6 @@ ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNo
     {
       XMLCh *rprSting = nullptr;
       transString_.charToXMLCh("w:rPr", &rprSting);
-      // TODO: 2024/1/7 getLocalName() 要改成 getNodeName()
       if (XERCES_CPP_NAMESPACE::XMLString::equals(tempNode->getNodeName(), rprSting))
       {
         hasRpr = true;
@@ -220,7 +214,7 @@ ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNo
         style_.findStyleByStyleId(styleIDStr, &style);
         if (style == nullptr)
         {
-          std::cerr << "Style is empty!" << std::endl;
+          std::cout << "Style is empty!" << std::endl;
           return qi::ErrorCode::ErrorCodeEnum::FAILED;
         }
         rprStyle = style;
@@ -409,6 +403,7 @@ ErrorCode::ErrorCodeEnum Template::getStyleIndex(int *index)
 }
 ErrorCode::ErrorCodeEnum Template::getStyle(xercesc_3_2::DOMNode **styleNode)
 {
+  // 获取当前样式只需要把当前样式的指针赋值给styleNode即可，因为Template类会一直遍历样式并把当前样式的指针赋值给currentStyle_
   *styleNode = currentStyle_;
   if (currentStyle_ != nullptr)
     std::cout << "Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(currentStyle_->getNodeName()) << std::endl;
@@ -416,16 +411,23 @@ ErrorCode::ErrorCodeEnum Template::getStyle(xercesc_3_2::DOMNode **styleNode)
 }
 ErrorCode::ErrorCodeEnum Template::getNextStyle(bool isNextDiv)
 {
+  // 如果找到关键字那么就得从关键字开始新的样式
   if (isNextDiv)
   {
+    // 从关键字开始新的样式，所有要改变currentStyle_的指针
     currentStyle_ = keywords_[keywordIndex_++].second->getNextSibling();
-    if (currentStyle_&& currentStyle_->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::TEXT_NODE)
+    // 如果currentStyle_指针不为空并且currentStyle_是文本节点那么就获取currentStyle_的下一个兄弟节点
+    if (currentStyle_ && currentStyle_->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::TEXT_NODE)
     {
       currentStyle_ = currentStyle_->getNextSibling();
     }
   } else
   {
-    if (currentStyle_&&currentStyle_->getNextSibling() != nullptr)
+    // 如果不是从关键字开始新的样式那么就获取currentStyle_的下一个兄弟节点开始新的样式
+    // 因为xml中一个节点的下一个兄弟节点可能是文本节点，所以要判断一下
+    // 因为一个新的关键字开始新的样式，所以要非关键字开始的时候currentStyle_指针肯定要指向一个sub节点，也就是样式节点
+    // 所以按照一个节点一个文本节点的顺序，currentStyle_指针指向的节点的下一个兄弟节点肯定是一个文本节点,所以需要获取的是下一个兄弟节点的兄弟节点
+    if (currentStyle_ && currentStyle_->getNextSibling() != nullptr)
     {
       if (currentStyle_->getNextSibling()->getNodeType() != XERCES_CPP_NAMESPACE::DOMNode::TEXT_NODE || currentStyle_->getNextSibling()->getNextSibling() != nullptr)
       {

@@ -162,32 +162,41 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
       // 清除换行符
       eraseSpaces.eraseNewLine(text);
       int index = -1;
+      // 查找关键字
       documentTemplate_.findKeyword(text, index);
+      // 未找到关键字index为-1
       if (index != -1)
       {
+        // TODO: 用于检测文档结构顺序是否正确
         ++currentIndex;
+        // 如果找到关键字了那就不需要进行新的检测块，因为关键字是检测块的开始
         isNewBlock = false;
+        // 此时getNextStyle()参数为true，表示从关键字开始新的检测块
         documentTemplate_.getNextStyle(true);
         std::cout << "Keyword: " << text << " Index: " << index << std::endl;
-        if (index == 2)
-        {
-          std::cout << "Index: " << currentIndex << " Text: " << text << std::endl;
-        }
       }
       else
       {
+        // 如果没有找到关键字，那么就需要开始新的检测块
         if (isNewBlock)
         {
+          // 这里的getNextStyle()参数为false，表示不是从关键字开始的检测块
           documentTemplate_.getNextStyle(false);
+          // 以经开始新的检测块了，所以isNewBlock设置为false
           isNewBlock = false;
         }
       }
+      // 获取段落为检测下一个run做准备
       XERCES_CPP_NAMESPACE::DOMNode *paragraph = nullptr;
+      // 获取段落
       paragraphs_.getParagraph(&paragraph);
       std::cout << "run" << XERCES_CPP_NAMESPACE::XMLString::transcode(run->getTextContent()) << std::endl;
+      // 检测run，检测是否符合模板
       documentTemplate_.checkRun(run, text, paragraph);
+      // 获取下一个run
       runs.getNextRun(&run);
     }
+    // 获取下一个段落
     paragraphs_.nextParagraph();
   }
   return ErrorCode::ErrorCodeEnum::SUCCESS;
