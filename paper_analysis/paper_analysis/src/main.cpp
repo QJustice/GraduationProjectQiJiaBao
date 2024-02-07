@@ -45,6 +45,7 @@ int main()
     document.setStyle("D:\\WorkSpace\\VSCodeFile\\word\\Template01\\word\\styles.xml");
     document.checkDocument();
 
+
   }
 #endif
 #if 0

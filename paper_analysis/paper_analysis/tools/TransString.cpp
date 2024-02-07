@@ -24,7 +24,9 @@
 // Additional comments or code go here
 #include "TransString.h"
 
+#include <sstream>
 #include <string>
+#include <iomanip>
 
 namespace qi {
 TransString::TransString()
@@ -54,21 +56,47 @@ TransString::~TransString()
       charStrings_.pop_back();
     }
   }
+  // 检测 strStrings_ 是否为空，判断是否有未释放内存的 std::string 字符串
+  if (!strStrings_.empty())
+  {
+    // 循环遍历 strStrings_ 并释放内存
+    while (strStrings_.size() > 0)
+    {
+      delete strStrings_.back();
+      // 丢弃最后一个元素，因为它已经被释放
+      strStrings_.pop_back();
+    }
+  }
 }
 ErrorCode::ErrorCodeEnum qi::TransString::xmlCharToChar(const XMLCh *toTranscode, char **charStr)
 {
   // 调用 transcode 函数将 XMLCh 转换为 string
-  char* tempChar = XERCES_CPP_NAMESPACE::XMLString::transcode(toTranscode);
+  char *tempChar = XERCES_CPP_NAMESPACE::XMLString::transcode(toTranscode);
   // 带出转换后的 char 字符串
   *charStr = tempChar;
   // 保存转换后的 char 字符串, 用于释放内存
   charStrings_.push_back(tempChar);
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
+
+ErrorCode::ErrorCodeEnum TransString::xmlCharToString(const XMLCh *toTranscode, std::string **str)
+{
+  // 调用 transcode 函数将 XMLCh 转换为 string
+  char *tempChar = XERCES_CPP_NAMESPACE::XMLString::transcode(toTranscode);
+  // 带出字符串
+  *str = new std::string(tempChar);
+  // 保存转换后的 char 字符串, 用于释放内存
+  charStrings_.push_back(tempChar);
+  // 保存转换后的 std::string 字符串, 用于释放内存
+  strStrings_.push_back(*str);
+
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+
 ErrorCode::ErrorCodeEnum TransString::charToXMLCh(const char *toTranscode, XMLCh **xmlStr)
 {
   // 调用 transcode 函数将 string 转换为 XMLCh
-  XMLCh* tempXMLCh = XERCES_CPP_NAMESPACE::XMLString::transcode(toTranscode);
+  XMLCh *tempXMLCh = XERCES_CPP_NAMESPACE::XMLString::transcode(toTranscode);
   // 带出转换后的 XMLCh 字符串
   *xmlStr = tempXMLCh;
   // 保存转换后的 XMLCh 字符串, 用于释放内存
@@ -77,12 +105,21 @@ ErrorCode::ErrorCodeEnum TransString::charToXMLCh(const char *toTranscode, XMLCh
 }
 ErrorCode::ErrorCodeEnum TransString::xmlsize_tToXMLCh(const XMLSize_t toTranscode, XMLCh **xmlStr)
 {
-    // 把XMLSize_t转换为XMLCh
+  // 把XMLSize_t转换为XMLCh
   XMLCh *xmlString = XERCES_CPP_NAMESPACE::XMLString::transcode(std::to_string(toTranscode).c_str());
   // 带出转换后的 XMLCh 字符串
   *xmlStr = xmlString;
   // 保存转换后的 XMLCh 字符串, 用于释放内存
   xmlStrings_.push_back(xmlString);
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum TransString::convertToString(int num, std::string &str)
+{
+  // 数字转字符串
+  std::ostringstream oss;
+  // 使用流输出数字到字符串流中，并设置宽度为两位，不够的部分会在左侧补零
+  oss << std::setw(2) << std::setfill('0') << num;
+  str = oss.str();
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 }// namespace qi

@@ -27,15 +27,15 @@
 #define PAPER_ANALYSIS_TEMPLATE_H
 
 #include <string>
-#include <map>
+#include <vector>
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMLSParser.hpp>
 
-#include "ErrorCode.h"
 #include "DOMElementComparator.h"
-#include "TransString.h"
-#include "Style.h"
+#include "ErrorCode.h"
 #include "Run.h"
+#include "Style.h"
+#include "TransString.h"
 
 namespace qi {
 
@@ -52,12 +52,18 @@ private:
   std::string templateName_;
   // 关键字数量
   XMLSize_t keywordCount_;
+  // 关键字索引
+  int keywordIndex_ = 0;
   // Style 样式
   Style style_;
+  // div 标签列表
+  XERCES_CPP_NAMESPACE::DOMNodeList* divList_;
   // 字符串转换工具
   TransString transString_;
   // 模板关键字, 关键字索引
-  std::map<const std::string , XMLSize_t> keywords_;
+  std::vector<std::pair<const std::string, XERCES_CPP_NAMESPACE::DOMNode*>> keywords_;
+  // 当前工作中的样式
+  XERCES_CPP_NAMESPACE::DOMNode* currentStyle_;
 
 public:
   Template();
@@ -71,15 +77,26 @@ public:
   // 解析模板文件
   ErrorCode::ErrorCodeEnum parseTemplateFile();
   // Find the keyword in the template
-  ErrorCode::ErrorCodeEnum findKeyword(const std::string keyword, XMLSize_t** index);
+  ErrorCode::ErrorCodeEnum findKeyword(const std::string keyword, int& index);
   // 获取rPr样式
-  ErrorCode::ErrorCodeEnum getRunStyle(const XERCES_CPP_NAMESPACE::DOMNode* run,XERCES_CPP_NAMESPACE::DOMNode** rpr, XERCES_CPP_NAMESPACE::DOMElement** styleRpr);
+  ErrorCode::ErrorCodeEnum getRunStyle(const XERCES_CPP_NAMESPACE::DOMNode* run, XERCES_CPP_NAMESPACE::DOMNode** rpr, XERCES_CPP_NAMESPACE::DOMElement** styleRpr);
   // 获取pPr样式
-  ErrorCode::ErrorCodeEnum getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode* paragraph,XERCES_CPP_NAMESPACE::DOMNode** ppr, XERCES_CPP_NAMESPACE::DOMElement** stylePpr);
+  ErrorCode::ErrorCodeEnum getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode* paragraph, XERCES_CPP_NAMESPACE::DOMNode** ppr, XERCES_CPP_NAMESPACE::DOMElement** stylePpr);
   // 检测目标run是否符合模板格式
-  ErrorCode::ErrorCodeEnum checkRun(const XERCES_CPP_NAMESPACE::DOMNode * run, const std::string keyword, const XERCES_CPP_NAMESPACE::DOMNode* paragraphs);
+  ErrorCode::ErrorCodeEnum checkRun(const XERCES_CPP_NAMESPACE::DOMNode* run, const std::string keyword, const XERCES_CPP_NAMESPACE::DOMNode* paragraphs);
   // 根据关键字获取模板样式
   ErrorCode::ErrorCodeEnum getStyleFromKey(const std::string keyword, XERCES_CPP_NAMESPACE::DOMNode** style);
+  // 获取当前样式索引
+  ErrorCode::ErrorCodeEnum getStyleIndex(int* index);
+  // 获取当前样式
+  ErrorCode::ErrorCodeEnum getStyle(XERCES_CPP_NAMESPACE::DOMNode** styleNode);
+  // 获取下一个样式
+  ErrorCode::ErrorCodeEnum getNextStyle(bool isNextDiv);
+  // 获取上一个样式
+  ErrorCode::ErrorCodeEnum getPreviousStyle();
+  // 重置样式
+  ErrorCode::ErrorCodeEnum resetStyle();
+  void printTemplate();
 };
 
 }// namespace qi

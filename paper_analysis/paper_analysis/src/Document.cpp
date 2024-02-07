@@ -124,9 +124,10 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
   // 获取段落数量
   XMLSize_t paragraphCount = 0;
   paragraphs_.getParagraphCount(&paragraphCount);
-  // 标记是否检测
-  bool isCheck = false;
-  // 打印出所有段落中的文本
+  //  当前检测块索引
+  XMLSize_t currentIndex = -1;
+  // 是否开始新的检测块
+  bool isNewBlock = false;
   for (XMLSize_t i = 0; i < paragraphCount; ++i)
   {
     // 保存获取的文本
@@ -136,17 +137,20 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
     eraseSpaces.eraseSpaces(text);
     // 清除换行符
     eraseSpaces.eraseNewLine(text);
+    // 如果文本为空，跳过
     if (text.empty())
     {
       paragraphs_.nextParagraph();
+      isNewBlock = true;
       continue;
     }
-    //std::cout << "Paragraph: " << text << std::endl;
+    // std::cout << "Paragraph: " << text << std::endl;
     // 解析段落中的run
     Run runs(&paragraphs_, document_);
     XMLSize_t runCount = 0;                      // 段落中的run数量
     runs.getRunCount(&runCount);                 // 获取run数量
     XERCES_CPP_NAMESPACE::DOMNode *run = nullptr;// run 节点
+                                                 // 标记是否找到关键字
     for (XMLSize_t j = 0; j < runCount; ++j)
     {
       // 获取run节点
@@ -157,19 +161,31 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
       eraseSpaces.eraseSpaces(text);
       // 清除换行符
       eraseSpaces.eraseNewLine(text);
-      XMLSize_t *index = nullptr;
-      documentTemplate_.findKeyword(text, &index);
-      if (index != nullptr)
+      int index = -1;
+      documentTemplate_.findKeyword(text, index);
+      if (index != -1)
       {
-        isCheck = true;
-        std::cout << "Keyword: " << text << " Index: " << *index << std::endl;
+        ++currentIndex;
+        isNewBlock = false;
+        documentTemplate_.getNextStyle(true);
+        std::cout << "Keyword: " << text << " Index: " << index << std::endl;
+        if (index == 2)
+        {
+          std::cout << "Index: " << currentIndex << " Text: " << text << std::endl;
+        }
       }
-      if (isCheck)
+      else
       {
-        XERCES_CPP_NAMESPACE::DOMNode *paragraph = nullptr;
-        paragraphs_.getParagraph(&paragraph);
-        documentTemplate_.checkRun(run, text, paragraph);
+        if (isNewBlock)
+        {
+          documentTemplate_.getNextStyle(false);
+          isNewBlock = false;
+        }
       }
+      XERCES_CPP_NAMESPACE::DOMNode *paragraph = nullptr;
+      paragraphs_.getParagraph(&paragraph);
+      std::cout << "run" << XERCES_CPP_NAMESPACE::XMLString::transcode(run->getTextContent()) << std::endl;
+      documentTemplate_.checkRun(run, text, paragraph);
       runs.getNextRun(&run);
     }
     paragraphs_.nextParagraph();
