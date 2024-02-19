@@ -52,6 +52,7 @@ set(SOURCE
         include/EraseSpaces.h
         include/TransString.h
         include/FindElements.h
+        include/XMLPrinter.h
         src/main.cpp
         src/Document.cpp
         src/Paragraph.cpp
@@ -67,6 +68,7 @@ set(SOURCE
         tools/EraseSpaces.cpp
         tools/TransString.cpp
         tools/FindElements.cpp
+        tools/XMLPrinter.cpp
 )
 
 # 将源代码添加到此项目的可执行文件。

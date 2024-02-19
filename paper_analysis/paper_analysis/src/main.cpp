@@ -40,7 +40,7 @@ int main()
 #if 1
   {
     qi::Document document;
-    document.loadDocument("D:\\WorkSpace\\VSCodeFile\\word\\Template01\\word\\document.xml");
+    document.loadDocument("D:\\WorkSpace\\VSCodeFile\\word\\Template01\\word\\document01.xml");
     document.setTemplate("D:\\WorkSpace\\GraduationProject\\GraduationProjectQiJiaBao\\paper_analysis\\paper_analysis\\data\\Template\\Undergraduate\\test01.xml");
     document.setStyle("D:\\WorkSpace\\VSCodeFile\\word\\Template01\\word\\styles.xml");
     document.checkDocument();

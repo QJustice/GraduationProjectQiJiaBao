@@ -64,7 +64,7 @@ ErrorCode::ErrorCodeEnum Paragraph::paragraphsParser(XERCES_CPP_NAMESPACE::DOMDo
   if (ErrorCode::ErrorCodeEnum::SUCCESS == nodeToElement.nodeToElement(document_->getDocumentElement(), &convertedElement))
   {
     // 查找文档的所有<w:p>标签
-    findElements.FindElementByXPath(document_, convertedElement, "./body/*", &paragraphListXPath_);
+    findElements.FindElementByXPath(document_, convertedElement, "./body/p", &paragraphListXPath_);
   }
   else
   {

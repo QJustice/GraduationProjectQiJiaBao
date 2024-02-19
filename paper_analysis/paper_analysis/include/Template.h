@@ -33,6 +33,7 @@
 
 #include "DOMElementComparator.h"
 #include "ErrorCode.h"
+#include "Paragraph.h"
 #include "Run.h"
 #include "Style.h"
 #include "TransString.h"
@@ -54,6 +55,10 @@ private:
   XMLSize_t keywordCount_;
   // 关键字索引
   int keywordIndex_ = 0;
+  // 当前解析的段落
+  Paragraph currentParagraph_;
+  // 当前工作中的样式
+  XERCES_CPP_NAMESPACE::DOMNode* currentStyle_;
   // Style 样式
   Style style_;
   // div 标签列表
@@ -62,8 +67,6 @@ private:
   TransString transString_;
   // 模板关键字, 关键字索引
   std::vector<std::pair<const std::string, XERCES_CPP_NAMESPACE::DOMNode*>> keywords_;
-  // 当前工作中的样式
-  XERCES_CPP_NAMESPACE::DOMNode* currentStyle_;
 
 public:
   Template();
@@ -74,6 +77,8 @@ public:
   ErrorCode::ErrorCodeEnum openTemplateFile(const std::string& templateFilePath);
   // 加载模板文件
   ErrorCode::ErrorCodeEnum setStyleFile(const std::string& styleFilePath);
+  // 保存当前检测的段落
+  ErrorCode::ErrorCodeEnum setCurrentParagraph(Paragraph paragraph);
   // 解析模板文件
   ErrorCode::ErrorCodeEnum parseTemplateFile();
   // Find the keyword in the template
@@ -83,7 +88,7 @@ public:
   // 获取pPr样式
   ErrorCode::ErrorCodeEnum getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode* paragraph, XERCES_CPP_NAMESPACE::DOMNode** ppr, XERCES_CPP_NAMESPACE::DOMElement** stylePpr);
   // 检测目标run是否符合模板格式
-  ErrorCode::ErrorCodeEnum checkRun(const XERCES_CPP_NAMESPACE::DOMNode* run, const std::string keyword, const XERCES_CPP_NAMESPACE::DOMNode* paragraphs);
+  ErrorCode::ErrorCodeEnum checkRun(const XERCES_CPP_NAMESPACE::DOMNode* run, const std::string keyword, const XERCES_CPP_NAMESPACE::DOMNode* paragraph);
   // 根据关键字获取模板样式
   ErrorCode::ErrorCodeEnum getStyleFromKey(const std::string keyword, XERCES_CPP_NAMESPACE::DOMNode** style);
   // 获取当前样式索引
@@ -96,6 +101,8 @@ public:
   ErrorCode::ErrorCodeEnum getPreviousStyle();
   // 重置样式
   ErrorCode::ErrorCodeEnum resetStyle();
+  // 检测样式
+  ErrorCode::ErrorCodeEnum checkStyle(const XERCES_CPP_NAMESPACE::DOMNode* style, const XERCES_CPP_NAMESPACE::DOMNode* run, const XERCES_CPP_NAMESPACE::DOMNode* paragraph);
   void printTemplate();
 };
 
