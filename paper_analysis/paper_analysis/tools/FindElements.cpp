@@ -33,6 +33,7 @@
 #include <xercesc/dom/DOMXPathResult.hpp>
 
 #include "NodeToElement.h"
+#include "XMLPrinter.h"
 
 namespace qi {
 FindElements::FindElements()
@@ -144,6 +145,32 @@ ErrorCode::ErrorCodeEnum FindElements::FindOneElementByID(xercesc_3_2::DOMElemen
       }
     }
   }
+
+  return ErrorCode::ErrorCodeEnum::SUCCESS;
+}
+ErrorCode::ErrorCodeEnum FindElements::FindElementByTagName(xercesc_3_2::DOMElement* parentElement, const std::string& nodeName, xercesc_3_2::DOMNodeList** result)
+{
+  // 检查父节点是否为空
+  if (parentElement == nullptr)
+  {
+    std::cerr << "父节点为空" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 检查标签名是否为空
+  if (nodeName.empty())
+  {
+    std::cerr << "标签名为空" << std::endl;
+    return ErrorCode::ErrorCodeEnum::FAILED;
+  }
+  // 调用 charToXMLCh 函数将 char* 转换为 XMLCh*
+  XMLCh* xmlNodeName = nullptr;
+  transString_.charToXMLCh(nodeName.c_str(), &xmlNodeName);
+
+  XMLPrinter::printNode(parentElement);
+
+
+  // 获取标签名为nodeName的节点
+  *result = parentElement->getElementsByTagName(xmlNodeName);
 
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }

@@ -103,6 +103,8 @@ public:
   ErrorCode::ErrorCodeEnum resetStyle();
   // 检测样式
   ErrorCode::ErrorCodeEnum checkStyle(const XERCES_CPP_NAMESPACE::DOMNode* style, const XERCES_CPP_NAMESPACE::DOMNode* run, const XERCES_CPP_NAMESPACE::DOMNode* paragraph);
+  // 模板对比样式
+  ErrorCode::ErrorCodeEnum compareStyle(XERCES_CPP_NAMESPACE::DOMNode* style, XERCES_CPP_NAMESPACE::DOMNode* textStyle, bool *isSame);
   void printTemplate();
 };
 

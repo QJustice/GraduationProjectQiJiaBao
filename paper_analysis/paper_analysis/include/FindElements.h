@@ -67,6 +67,10 @@ public:
                                               const std::string& targeID,
                                               const std::string& id,
                                               XERCES_CPP_NAMESPACE::DOMNode** result);
+  // 通过NodeName搜索Element
+  ErrorCode::ErrorCodeEnum FindElementByTagName(XERCES_CPP_NAMESPACE::DOMElement* parentElement,
+                                                const std::string& nodeName,
+                                                XERCES_CPP_NAMESPACE::DOMNodeList** result);
 };
 
 }// namespace qi

@@ -18,7 +18,7 @@
         <name>本科毕业论文（设计）</name>
         <sub>1
             <!--  字体  -->
-            <w:rFonts w:eastAsia="华文新魏"/>
+            <w:rFonts w:eastAsia="eastAsia"/>
             <!-- 字号  -->
             <w:sz w:val="72"/>
             <!-- 字间距 -->
