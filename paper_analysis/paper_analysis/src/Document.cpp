@@ -173,7 +173,7 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
         isNewBlock = false;
         // 此时getNextStyle()参数为true，表示从关键字开始新的检测块
         documentTemplate_.getNextStyle(true);
-        std::cout << "Keyword: " << text << " Index: " << index << std::endl;
+        // std::cout << "Keyword: " << text << " Index: " << index << std::endl;
       }
       else
       {
@@ -190,7 +190,7 @@ ErrorCode::ErrorCodeEnum Document::checkDocument()
       XERCES_CPP_NAMESPACE::DOMNode *paragraph = nullptr;
       // 获取段落
       paragraphs_.getParagraph(&paragraph);
-      std::cout << "run" << XERCES_CPP_NAMESPACE::XMLString::transcode(run->getTextContent()) << std::endl;
+      // std::cout << "run" << XERCES_CPP_NAMESPACE::XMLString::transcode(run->getTextContent()) << std::endl;
       // 检测run，检测是否符合模板
       documentTemplate_.checkRun(run, text, paragraph);
       // 获取下一个run

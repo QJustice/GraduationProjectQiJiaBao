@@ -331,7 +331,7 @@ ErrorCode::ErrorCodeEnum Template::checkRun(const XERCES_CPP_NAMESPACE::DOMNode 
     //std::cerr << "Style File style is empty!" << std::endl;
     return qi::ErrorCode::ErrorCodeEnum::FAILED;
   }
-  std::cout << "name1: " << text << std::endl;
+  // std::cout << "name1: " << text << std::endl;
 
   // 检测样式
   checkStyle(style, run, paragraph);
@@ -411,8 +411,8 @@ ErrorCode::ErrorCodeEnum Template::getStyle(xercesc_3_2::DOMNode **styleNode)
 {
   // 获取当前样式只需要把当前样式的指针赋值给styleNode即可，因为Template类会一直遍历样式并把当前样式的指针赋值给currentStyle_
   *styleNode = currentStyle_;
-  if (currentStyle_ != nullptr)
-    std::cout << "Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(currentStyle_->getNodeName()) << std::endl;
+//  if (currentStyle_ != nullptr)
+//    std::cout << "Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(currentStyle_->getNodeName()) << std::endl;
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 ErrorCode::ErrorCodeEnum Template::getNextStyle(bool isNextDiv)
@@ -518,13 +518,13 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
     }
     if (rpr != nullptr && !isOk)
     {
-      XMLPrinter::printNode(rpr);
-      XMLPrinter::printNode(style);
+      // XMLPrinter::printNode(rpr);
+      // XMLPrinter::printNode(style);
       compareStyle(child, rpr, &isOk);
     }
     if (styleRpr != nullptr && !isOk)
     {
-      XMLPrinter::printNode(styleRpr);
+      // XMLPrinter::printNode(styleRpr);
       compareStyle(child, styleRpr, &isOk);
     }
     // 遍历paragraph的ppr标签
@@ -538,12 +538,12 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
     }
     if (ppr != nullptr && !isOk)
     {
-      XMLPrinter::printNode(ppr);
+      // XMLPrinter::printNode(ppr);
       compareStyle(child, ppr, &isOk);
     }
     if (stylePpr != nullptr && !isOk)
     {
-      XMLPrinter::printNode(stylePpr);
+      // XMLPrinter::printNode(stylePpr);
       compareStyle(child, stylePpr, &isOk);
     }
 
@@ -557,12 +557,12 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
 
     if (docDefaults != nullptr && !isOk)
     {
-      XMLPrinter::printNode(docDefaults);
+      // XMLPrinter::printNode(docDefaults);
       compareStyle(child, docDefaults, &isOk);
     }
     if (!isOk)
     {
-      XMLPrinter::printNode(child);
+      // XMLPrinter::printNode(child);
       std::cout << "style is not OK" << std::endl;
     }
     else
@@ -656,8 +656,8 @@ ErrorCode::ErrorCodeEnum Template::compareStyle(XERCES_CPP_NAMESPACE::DOMNode *s
       // 从node寻找 叫styleAttribute->getNodeName() 的属性
       for (XMLSize_t k = 0; k < textStyleAttributes->getLength(); k++)
       {
-        std::cout << XMLString::transcode(styleAttribute->getNodeName()) << std::endl;
-        std::cout << XMLString::transcode(textStyleAttributes->item(k)->getNodeName()) << std::endl;
+        // std::cout << XMLString::transcode(styleAttribute->getNodeName()) << std::endl;
+        // std::cout << XMLString::transcode(textStyleAttributes->item(k)->getNodeName()) << std::endl;
         if (XMLString::equals(styleAttribute->getNodeName(), textStyleAttributes->item(k)->getNodeName()))
         {
           // 获取styleAttribute的值
@@ -667,8 +667,8 @@ ErrorCode::ErrorCodeEnum Template::compareStyle(XERCES_CPP_NAMESPACE::DOMNode *s
           char *textStyleAttributeValue = nullptr;
           transString_.xmlCharToChar(textStyleAttributes->item(k)->getNodeValue(), &textStyleAttributeValue);
           // 比较styleAttribute的值和textStyleAttribute的值是否相同
-          std::cout << "styleAttributeValue: " << styleAttributeValue << std::endl;
-          std::cout << "textStyleAttributeValue: " << textStyleAttributeValue << std::endl;
+          // std::cout << "styleAttributeValue: " << styleAttributeValue << std::endl;
+          // std::cout << "textStyleAttributeValue: " << textStyleAttributeValue << std::endl;
           if (strcmp(styleAttributeValue, textStyleAttributeValue) == 0)
           {
             *isSame = true;
