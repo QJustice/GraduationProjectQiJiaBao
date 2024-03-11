@@ -166,7 +166,7 @@ ErrorCode::ErrorCodeEnum FindElements::FindElementByTagName(xercesc_3_2::DOMElem
   XMLCh* xmlNodeName = nullptr;
   transString_.charToXMLCh(nodeName.c_str(), &xmlNodeName);
 
-  XMLPrinter::printNode(parentElement);
+  // XMLPrinter::printNode(parentElement);
 
 
   // 获取标签名为nodeName的节点

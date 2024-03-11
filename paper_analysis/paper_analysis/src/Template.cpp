@@ -195,7 +195,7 @@ ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNo
         for (XMLSize_t j = 0; j < rPrChildren->getLength(); ++j)
         {
           tempNode = rPrChildren->item(j);
-          XMLPrinter::printNode(tempNode);
+          // XMLPrinter::printNode(tempNode);
 
           transString_.charToXMLCh("w:rStyle", &rprSting);
           if (XERCES_CPP_NAMESPACE::XMLString::equals(tempNode->getNodeName(), rprSting))
@@ -235,7 +235,7 @@ ErrorCode::ErrorCodeEnum Template::getRunStyle(const XERCES_CPP_NAMESPACE::DOMNo
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 
-ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode *paragraph, XERCES_CPP_NAMESPACE::DOMNode **ppr, XERCES_CPP_NAMESPACE::DOMElement **stylePpr)
+ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE::DOMNode *paragraph, XERCES_CPP_NAMESPACE::DOMNode **ppr, XERCES_CPP_NAMESPACE::DOMNode** rpr, XERCES_CPP_NAMESPACE::DOMElement **stylePpr)
 {
 
   // 遍历p的所有孩子节点获取rPr样式
@@ -249,6 +249,7 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
     if (tempNode->getNodeType() == XERCES_CPP_NAMESPACE::DOMNode::ELEMENT_NODE)
     {
       XMLCh *pprSting = nullptr;
+      XMLCh *rprSting = nullptr;
       transString_.charToXMLCh("w:pPr", &pprSting);
       // TODO: 2024/1/7 getLocalName() 要改成 getNodeName()
       if (XERCES_CPP_NAMESPACE::XMLString::equals(tempNode->getNodeName(), pprSting))
@@ -258,7 +259,8 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
         for (XMLSize_t j = 0; j < pPrChildren->getLength(); ++j)
         {
           tempNode = pPrChildren->item(j);
-          XMLPrinter::printNode(tempNode);
+          // XMLPrinter::printNode(tempNode);
+          transString_.charToXMLCh("w:rPr", &rprSting);
           transString_.charToXMLCh("w:pStyle", &pprSting);
           if (XERCES_CPP_NAMESPACE::XMLString::equals(tempNode->getNodeName(), pprSting))
           {
@@ -280,8 +282,12 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
             }
             pprStyle = style;
             // 打印
-            std::cout << "Ppr Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(style->getNodeName()) << std::endl;
+            // std::cout << "Ppr Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(style->getNodeName()) << std::endl;
             break;
+          }
+          if (XERCES_CPP_NAMESPACE::XMLString::equals(tempNode->getNodeName(), rprSting))
+          {
+            // TODO: 2024/1/7 获取rpr样式
           }
         }
         break;
@@ -411,8 +417,8 @@ ErrorCode::ErrorCodeEnum Template::getStyle(xercesc_3_2::DOMNode **styleNode)
 {
   // 获取当前样式只需要把当前样式的指针赋值给styleNode即可，因为Template类会一直遍历样式并把当前样式的指针赋值给currentStyle_
   *styleNode = currentStyle_;
-//  if (currentStyle_ != nullptr)
-//    std::cout << "Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(currentStyle_->getNodeName()) << std::endl;
+  //  if (currentStyle_ != nullptr)
+  //    std::cout << "Style: " << XERCES_CPP_NAMESPACE::XMLString::transcode(currentStyle_->getNodeName()) << std::endl;
   return ErrorCode::ErrorCodeEnum::SUCCESS;
 }
 ErrorCode::ErrorCodeEnum Template::getNextStyle(bool isNextDiv)
@@ -528,13 +534,19 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
       compareStyle(child, styleRpr, &isOk);
     }
     // 遍历paragraph的ppr标签
+    XERCES_CPP_NAMESPACE::DOMNode *paragraphRpr = nullptr;
     XERCES_CPP_NAMESPACE::DOMNode *ppr = nullptr;
     XERCES_CPP_NAMESPACE::DOMElement *stylePpr = nullptr;
-    getParagraphStyle(paragraph, &ppr, &stylePpr);
+    getParagraphStyle(paragraph, &ppr, &paragraphRpr, &stylePpr);
     // 检查ppr是否为空
-    if (ppr == nullptr && stylePpr == nullptr)
+    if (ppr == nullptr && stylePpr == nullptr && paragraphRpr == nullptr)
     {
       std::cerr << "Paragraph style is empty!" << std::endl;
+    }
+    if (paragraphRpr != nullptr && !isOk)
+    {
+      // XMLPrinter::printNode(paragraphRpr);
+      compareStyle(child, paragraphRpr, &isOk);
     }
     if (ppr != nullptr && !isOk)
     {
@@ -563,9 +575,13 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
     if (!isOk)
     {
       // XMLPrinter::printNode(child);
-      std::cout << "style is not OK" << std::endl;
-    }
-    else
+      std::string *text = nullptr;
+      transString_.xmlCharToString(run->getTextContent(), &text);
+      EraseSpaces eraseSpaces;
+      eraseSpaces.eraseSpaces(*text);
+      eraseSpaces.eraseNewLine(*text);
+      std::cout << "style is not OK, the error is near " << *text << std::endl;
+    } else
       std::cout << "Style is OK!" << std::endl;
     // 检查样式是否符合模板
     //  if (style_.checkStyle(style, rpr, ppr))
@@ -616,8 +632,8 @@ ErrorCode::ErrorCodeEnum Template::compareStyle(XERCES_CPP_NAMESPACE::DOMNode *s
     std::cerr << "Result list is nullptr!" << std::endl;
     return qi::ErrorCode::ErrorCodeEnum::FAILED;
   }
-  XMLPrinter::printNode(resultList->item(0));
-  XMLPrinter::printNode(styleElement);
+  // XMLPrinter::printNode(resultList->item(0));
+  // XMLPrinter::printNode(styleElement);
 
   // 比较style和textStyle是否相同
   // 遍历resultList
@@ -628,7 +644,7 @@ ErrorCode::ErrorCodeEnum Template::compareStyle(XERCES_CPP_NAMESPACE::DOMNode *s
     // 检查node是否为空
     if (node == nullptr)
     {
-      std::cerr << "Node is nullptr!" << std::endl;
+      std::cout << "not find style from target files" << std::endl;
       *isSame = false;
       return qi::ErrorCode::ErrorCodeEnum::FAILED;
     }
@@ -667,11 +683,13 @@ ErrorCode::ErrorCodeEnum Template::compareStyle(XERCES_CPP_NAMESPACE::DOMNode *s
           char *textStyleAttributeValue = nullptr;
           transString_.xmlCharToChar(textStyleAttributes->item(k)->getNodeValue(), &textStyleAttributeValue);
           // 比较styleAttribute的值和textStyleAttribute的值是否相同
-          // std::cout << "styleAttributeValue: " << styleAttributeValue << std::endl;
-          // std::cout << "textStyleAttributeValue: " << textStyleAttributeValue << std::endl;
           if (strcmp(styleAttributeValue, textStyleAttributeValue) == 0)
           {
             *isSame = true;
+          } else
+          {
+            *isSame = false;
+            std::cout << "Now Check Style is " << *styleString << " Style Files in is " << styleAttributeValue << " Target Files is " << textStyleAttributeValue << std::endl;
           }
         }
       }
