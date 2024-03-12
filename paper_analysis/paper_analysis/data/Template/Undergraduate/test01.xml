@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--<Template>-->
-<!--    <div id="0">-->
-<!--        <name>AAA</name>-->
-<!--    </div>-->
-<!--    <div id="1">-->
-<!--        <name>BBB</name>-->
-<!--    </div>-->
-<!--    <div id="2">-->
-<!--        <name>CCC</name>-->
-<!--    </div>-->
-<!--</Template>-->
-
-
 <Template xmlns:w="http://www.imnu.edu.cn">
-    <div id="0">div1
+    <div id="0">
         <!--        <name>本科毕业论文（设计）</name>-->
         <name>本科毕业论文（设计）</name>
-        <sub>1
+        <sub>
             <!--  字体  -->
             <w:rFonts w:eastAsia="eastAsia"/>
             <!-- 字号  -->
@@ -24,115 +11,62 @@
             <!-- 字间距 -->
             <w:kern w:val="2"/>
         </sub>
-        <sub>2
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
-        <sub>3
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
-        <sub>4
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
-        <sub>5
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
     </div>
-    <div id="1">div2
+    <div id="1">
         <name>毕业论文原创性声明</name>
-        <sub>21
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
-        <sub>22
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
-        <sub>23
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
-        <sub>24
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
-        <sub>25
+        <sub>
             <w:rFonts w:eastAsia="黑体"/>
             <w:sz w:val="36"/>
             <w:b/>
             <w:jc w:val="center"/>
         </sub>
-    </div>
-    <div id="2">
-        <name>目录</name>
-    </div>
-    <div id="3">
-        <name>摘要</name>
-    </div>
-    <div id="4">
-        <name>关键字</name>
-    </div>
-    <div id="5">
-        <name>Abstract</name>
-    </div>
-    <div id="6">
-        <name>Keywords</name>
-    </div>
-    <div id="7">
-        <name>致谢</name>
-    </div>
-    <div id="8">
-        <name>参考文献</name>
     </div>
 </Template>
-
-        <!--{{本科毕业论文（设计）}}-->
-        <!--{{中文论文题目}}-->
-        <!--{{EengligTitle}}-->
-        <!--{{2024年1月7日}}-->
-        <!--{{毕业论文原创性声明}}-->
-        <!--{{目录}}-->
-        <!--{{全文共xx页xxxx字}}-->
-        <!--{{基于Python的高校教务管理系统的设计与实现}}-->
-        <!--{{摘要}}-->
-        <!--{{关键词}}-->
-        <!--{{AnOrganixedTacticsofLargeDatabaseSystemforReal-timeCollectionandQuery}}-->
-        <!--{{Abstract}}-->
-        <!--{{Keywords}}-->
-        <!--{{$main}}-->
-        <!--{{致谢}}-->
-        <!--{{参考文献}}-->
-
-
-        <!--
-        {"本科毕业论文（设计", 0},
-        {"毕业论文原创性声明", 1},
-        {"目录", 2},
-        {"摘要", 3},
-        {"关键字", 4},
-        {"Abstract", 5},
-        {"Keywords", 6},
-        {"致谢", 7},
-        {"参考文献", 8}};
-        -->
-
-        <!-- Path: paper_analysis/data/Template/Undergraduate/test03.xml -->

@@ -240,6 +240,7 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
 
   // 遍历p的所有孩子节点获取rPr样式
   XERCES_CPP_NAMESPACE::DOMNode *pprNode = nullptr;
+  XERCES_CPP_NAMESPACE::DOMNode *rprNode = nullptr;
   XERCES_CPP_NAMESPACE::DOMElement *pprStyle = nullptr;
   XERCES_CPP_NAMESPACE::DOMNode *tempNode = nullptr;
   XERCES_CPP_NAMESPACE::DOMNodeList *children = paragraph->getChildNodes();
@@ -287,7 +288,7 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
           }
           if (XERCES_CPP_NAMESPACE::XMLString::equals(tempNode->getNodeName(), rprSting))
           {
-            // TODO: 2024/1/7 获取rpr样式
+            rprNode = tempNode;
           }
         }
         break;
@@ -295,6 +296,10 @@ ErrorCode::ErrorCodeEnum Template::getParagraphStyle(const XERCES_CPP_NAMESPACE:
     }
   }
   // 检查rpr是否为空
+  if (rprNode != nullptr)
+  {
+    *rpr = rprNode;
+  }
   if (pprNode != nullptr)
   {
     *ppr = pprNode;
@@ -581,8 +586,9 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
       eraseSpaces.eraseSpaces(*text);
       eraseSpaces.eraseNewLine(*text);
       std::cout << "style is not OK, the error is near " << *text << std::endl;
-    } else
-      std::cout << "Style is OK!" << std::endl;
+    }
+    // else
+    //   std::cout << "Style is OK!" << std::endl;
     // 检查样式是否符合模板
     //  if (style_.checkStyle(style, rpr, ppr))
     //  {
@@ -644,7 +650,7 @@ ErrorCode::ErrorCodeEnum Template::compareStyle(XERCES_CPP_NAMESPACE::DOMNode *s
     // 检查node是否为空
     if (node == nullptr)
     {
-      std::cout << "not find style from target files" << std::endl;
+      std::cout << *styleString << " is not find style from target files" << std::endl;
       *isSame = false;
       return qi::ErrorCode::ErrorCodeEnum::FAILED;
     }
