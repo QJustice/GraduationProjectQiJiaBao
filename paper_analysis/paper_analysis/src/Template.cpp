@@ -497,6 +497,10 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
   }
 
   // 遍历style获取每一个子节点
+  // 记录所需检测的样式数量
+  int styleCount = 0;
+  // 记录通过检测的样式数量
+  int passCount = 0;
   for (XERCES_CPP_NAMESPACE::DOMNode *child = style->getFirstChild(); child != nullptr; child = child->getNextSibling())
   {
     // 如果子节点不是元素节点就跳过
@@ -517,7 +521,8 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
 
     // 保存格式是否合格
     bool isOk = false;
-
+    // 新的样式所以要记录一下
+    styleCount++;
     // 遍历run的rpr标签
     XERCES_CPP_NAMESPACE::DOMNode *rpr = nullptr;
     XERCES_CPP_NAMESPACE::DOMElement *styleRpr = nullptr;
@@ -587,7 +592,16 @@ ErrorCode::ErrorCodeEnum Template::checkStyle(const XERCES_CPP_NAMESPACE::DOMNod
       eraseSpaces.eraseNewLine(*text);
       std::cout << "style is not OK, the error is near " << *text << std::endl;
     }
-    // else
+    else
+    {
+      // 如果通过检测就记录一下
+      passCount++;
+    }
+    // 貌似不需要告诉用户正确结果只需要告诉用户错误结果
+    //   if (styleCount == passCount)
+    //   {
+    //     std::cout << "Style is OK!" << std::endl;
+    //   }
     //   std::cout << "Style is OK!" << std::endl;
     // 检查样式是否符合模板
     //  if (style_.checkStyle(style, rpr, ppr))
